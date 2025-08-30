@@ -1,0 +1,32 @@
+{
+  "name": "cost-manager-app",
+  "version": "1.0.0",
+  "description": "A comprehensive cost management web application built with vanilla JavaScript and IndexedDB",
+  "main": "index.html",
+  "scripts": {
+    "start": "python -m http.server 8000",
+    "serve": "npx http-server -p 8000",
+    "test": "echo \"Open test-idb.html in your browser to test the idb.js library\""
+  },
+  "keywords": [
+    "cost-manager",
+    "expense-tracker",
+    "indexeddb",
+    "vanilla-javascript",
+    "charts",
+    "financial-app"
+  ],
+  "author": "Cost Manager Development Team",
+  "license": "MIT",
+  "devDependencies": {
+    "http-server": "^14.1.1"
+  },
+  "browserslist": [
+    "> 1%",
+    "last 2 versions",
+    "not dead"
+  ],
+  "engines": {
+    "node": ">=14.0.0"
+  }
+}

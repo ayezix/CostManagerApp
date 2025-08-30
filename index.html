@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cost Manager</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Cost Manager</h1>
+            <p>Track your expenses and analyze your spending patterns</p>
+        </header>
+
+        <nav class="nav-tabs">
+            <button class="nav-tab active" data-tab="add-cost">Add Cost</button>
+            <button class="nav-tab" data-tab="reports">Reports</button>
+            <button class="nav-tab" data-tab="charts">Charts</button>
+            <button class="nav-tab" data-tab="settings">Settings</button>
+        </nav>
+
+        <main>
+            <!-- Add Cost Tab -->
+            <div id="add-cost" class="tab-content active">
+                <div class="card">
+                    <h2>Add New Cost Item</h2>
+                    <form id="cost-form">
+                        <div class="form-group">
+                            <label for="sum">Amount:</label>
+                            <input type="number" id="sum" name="sum" step="0.01" min="0" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="currency">Currency:</label>
+                            <select id="currency" name="currency" required>
+                                <option value="USD">USD</option>
+                                <option value="ILS">ILS</option>
+                                <option value="GBP">GBP</option>
+                                <option value="EURO">EURO</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="category">Category:</label>
+                            <select id="category" name="category" required>
+                                <option value="">Select Category</option>
+                                <option value="Food">Food</option>
+                                <option value="Transportation">Transportation</option>
+                                <option value="Entertainment">Entertainment</option>
+                                <option value="Education">Education</option>
+                                <option value="Healthcare">Healthcare</option>
+                                <option value="Shopping">Shopping</option>
+                                <option value="Utilities">Utilities</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="description">Description:</label>
+                            <input type="text" id="description" name="description" required>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary">Add Cost Item</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Reports Tab -->
+            <div id="reports" class="tab-content">
+                <div class="card">
+                    <h2>Monthly Report</h2>
+                    <div class="report-controls">
+                        <div class="form-group">
+                            <label for="report-year">Year:</label>
+                            <select id="report-year"></select>
+                        </div>
+                        <div class="form-group">
+                            <label for="report-month">Month:</label>
+                            <select id="report-month"></select>
+                        </div>
+                        <div class="form-group">
+                            <label for="report-currency">Currency:</label>
+                            <select id="report-currency">
+                                <option value="USD">USD</option>
+                                <option value="ILS">ILS</option>
+                                <option value="GBP">GBP</option>
+                                <option value="EURO">EURO</option>
+                            </select>
+                        </div>
+                        <button id="generate-report" class="btn btn-primary">Generate Report</button>
+                    </div>
+                    
+                    <div id="report-results" class="report-results"></div>
+                </div>
+            </div>
+
+            <!-- Charts Tab -->
+            <div id="charts" class="tab-content">
+                <div class="card">
+                    <h2>Charts & Analytics</h2>
+                    
+                    <div class="chart-section">
+                        <h3>Pie Chart - Monthly Categories</h3>
+                        <div class="chart-controls">
+                            <div class="form-group">
+                                <label for="pie-year">Year:</label>
+                                <select id="pie-year"></select>
+                            </div>
+                            <div class="form-group">
+                                <label for="pie-month">Month:</label>
+                                <select id="pie-month"></select>
+                            </div>
+                            <div class="form-group">
+                                <label for="pie-currency">Currency:</label>
+                                <select id="pie-currency">
+                                    <option value="USD">USD</option>
+                                    <option value="ILS">ILS</option>
+                                    <option value="GBP">GBP</option>
+                                    <option value="EURO">EURO</option>
+                                </select>
+                            </div>
+                            <button id="generate-pie" class="btn btn-primary">Generate Pie Chart</button>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="pie-chart"></canvas>
+                        </div>
+                    </div>
+                    
+                    <div class="chart-section">
+                        <h3>Bar Chart - Monthly Totals</h3>
+                        <div class="chart-controls">
+                            <div class="form-group">
+                                <label for="bar-year">Year:</label>
+                                <select id="bar-year"></select>
+                            </div>
+                            <div class="form-group">
+                                <label for="bar-currency">Currency:</label>
+                                <select id="bar-currency">
+                                    <option value="USD">USD</option>
+                                    <option value="ILS">ILS</option>
+                                    <option value="GBP">GBP</option>
+                                    <option value="EURO">EURO</option>
+                                </select>
+                            </div>
+                            <button id="generate-bar" class="btn btn-primary">Generate Bar Chart</button>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="bar-chart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Settings Tab -->
+            <div id="settings" class="tab-content">
+                <div class="card">
+                    <h2>Settings</h2>
+                    <div class="form-group">
+                        <label for="exchange-rate-url">Exchange Rate API URL:</label>
+                        <input type="url" id="exchange-rate-url" name="exchange-rate-url" 
+                               placeholder="https://example.com/exchange-rates.json">
+                        <small>Enter the URL for getting currency exchange rates</small>
+                    </div>
+                    <button id="save-settings" class="btn btn-primary">Save Settings</button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="idb.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
