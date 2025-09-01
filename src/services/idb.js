@@ -1,16 +1,12 @@
 /**
- * IndexedDB Wrapper Library for Cost Manager Application
+ * IndexedDB Wrapper Library for Cost Manager Application (React Module Version)
  * This library provides a Promise-based interface for IndexedDB operations
+ * Compatible with ES6 modules for use in React development
  * Complies with Front-End Development Final Project requirements
  */
 
-// Global database object - as required by specifications for testing
-window.db = {};
-
-// For easier access and compliance with requirements document
-if (typeof window !== 'undefined') {
-    window.idb = window.db;
-}
+// Internal database reference
+let database = null;
 
 /**
  * Opens or creates a costs database
@@ -18,7 +14,7 @@ if (typeof window !== 'undefined') {
  * @param {number} databaseVersion - Version number of the database
  * @returns {Promise} Promise that resolves to the database object
  */
-window.db.openCostsDB = function(databaseName, databaseVersion) {
+export function openCostsDB(databaseName, databaseVersion) {
     return new Promise((resolve, reject) => {
         // Check if IndexedDB is supported
         if (!window.indexedDB) {
@@ -34,16 +30,16 @@ window.db.openCostsDB = function(databaseName, databaseVersion) {
         };
 
         request.onsuccess = function(event) {
-            const database = event.target.result;
-            resolve(database);
+            const db = event.target.result;
+            resolve(db);
         };
 
         request.onupgradeneeded = function(event) {
-            const database = event.target.result;
+            const db = event.target.result;
             
             // Create the costs object store if it doesn't exist
-            if (!database.objectStoreNames.contains('costs')) {
-                const costsStore = database.createObjectStore('costs', { 
+            if (!db.objectStoreNames.contains('costs')) {
+                const costsStore = db.createObjectStore('costs', { 
                     keyPath: 'id', 
                     autoIncrement: true 
                 });
@@ -57,14 +53,14 @@ window.db.openCostsDB = function(databaseName, databaseVersion) {
             }
         };
     });
-};
+}
 
 /**
  * Adds a new cost item to the database
  * @param {Object} cost - Cost object with properties: sum, currency, category, description
  * @returns {Promise} Promise that resolves to the newly added cost item
  */
-window.db.addCost = function(cost) {
+export function addCost(cost) {
     return new Promise((resolve, reject) => {
         // Validate input
         if (!cost || typeof cost.sum !== 'number' || typeof cost.currency !== 'string' || 
@@ -74,7 +70,7 @@ window.db.addCost = function(cost) {
         }
 
         // Get the current database instance
-        if (!this.database) {
+        if (!database) {
             reject(new Error('Database not initialized. Call openCostsDB first.'));
             return;
         }
@@ -92,7 +88,7 @@ window.db.addCost = function(cost) {
         };
 
         // Start a transaction
-        const transaction = this.database.transaction(['costs'], 'readwrite');
+        const transaction = database.transaction(['costs'], 'readwrite');
         const costsStore = transaction.objectStore('costs');
 
         // Add the cost item
@@ -124,7 +120,7 @@ window.db.addCost = function(cost) {
             reject(new Error('Transaction failed: ' + event.target.error));
         };
     });
-};
+}
 
 /**
  * Gets a detailed report for a specific month and year in a specific currency
@@ -133,7 +129,7 @@ window.db.addCost = function(cost) {
  * @param {string} currency - Target currency for the report
  * @returns {Promise} Promise that resolves to the report object
  */
-window.db.getReport = function(year, month, currency) {
+export function getReport(year, month, currency) {
     return new Promise((resolve, reject) => {
         // Validate input
         if (typeof year !== 'number' || typeof month !== 'number' || typeof currency !== 'string') {
@@ -147,13 +143,13 @@ window.db.getReport = function(year, month, currency) {
         }
 
         // Get the current database instance
-        if (!this.database) {
+        if (!database) {
             reject(new Error('Database not initialized. Call openCostsDB first.'));
             return;
         }
 
         // Start a transaction
-        const transaction = this.database.transaction(['costs'], 'readonly');
+        const transaction = database.transaction(['costs'], 'readonly');
         const costsStore = transaction.objectStore('costs');
 
         // Get all costs for the specified month and year
@@ -169,9 +165,9 @@ window.db.getReport = function(year, month, currency) {
 
             // Convert costs to the target currency and format the report
             const convertedCosts = filteredCosts.map(cost => {
-                // Currency conversion using global exchange rates
-                const convertedSum = window.db._convertCurrency ? 
-                    window.db._convertCurrency(cost.sum, cost.currency, currency) : 
+                // Currency conversion using exchange rates
+                const convertedSum = convertCurrency ? 
+                    convertCurrency(cost.sum, cost.currency, currency) : 
                     cost.sum;
                 
                 return {
@@ -205,28 +201,28 @@ window.db.getReport = function(year, month, currency) {
             reject(new Error('Transaction failed: ' + event.target.error));
         };
     });
-};
+}
 
 /**
  * Sets the database instance for internal use
- * @param {IDBDatabase} database - The IndexedDB database instance
+ * @param {IDBDatabase} db - The IndexedDB database instance
  */
-window.db.setDatabase = function(database) {
-    this.database = database;
-};
+export function setDatabase(db) {
+    database = db;
+}
 
 /**
  * Gets all costs from the database (utility method)
  * @returns {Promise} Promise that resolves to an array of all cost items
  */
-window.db.getAllCosts = function() {
+export function getAllCosts() {
     return new Promise((resolve, reject) => {
-        if (!this.database) {
+        if (!database) {
             reject(new Error('Database not initialized. Call openCostsDB first.'));
             return;
         }
 
-        const transaction = this.database.transaction(['costs'], 'readonly');
+        const transaction = database.transaction(['costs'], 'readonly');
         const costsStore = transaction.objectStore('costs');
         const request = costsStore.getAll();
 
@@ -238,20 +234,20 @@ window.db.getAllCosts = function() {
             reject(new Error('Failed to retrieve costs: ' + event.target.error));
         };
     });
-};
+}
 
 /**
  * Clears all costs from the database (utility method for testing)
  * @returns {Promise} Promise that resolves when all costs are cleared
  */
-window.db.clearAllCosts = function() {
+export function clearAllCosts() {
     return new Promise((resolve, reject) => {
-        if (!this.database) {
+        if (!database) {
             reject(new Error('Database not initialized. Call openCostsDB first.'));
             return;
         }
 
-        const transaction = this.database.transaction(['costs'], 'readwrite');
+        const transaction = database.transaction(['costs'], 'readwrite');
         const costsStore = transaction.objectStore('costs');
         const request = costsStore.clear();
 
@@ -263,7 +259,7 @@ window.db.clearAllCosts = function() {
             reject(new Error('Failed to clear costs: ' + event.target.error));
         };
     });
-};
+}
 
 /**
  * Currency conversion helper function
@@ -272,12 +268,12 @@ window.db.clearAllCosts = function() {
  * @param {string} toCurrency - Target currency
  * @returns {number} Converted amount
  */
-window.db._convertCurrency = function(amount, fromCurrency, toCurrency) {
+export function convertCurrency(amount, fromCurrency, toCurrency) {
     // Default exchange rates as per requirements
     const defaultRates = { USD: 1, GBP: 1.8, EURO: 0.7, ILS: 3.4 };
     
-    // Try to get rates from global app if available, otherwise use defaults
-    const rates = (window.app && window.app.exchangeRates) || defaultRates;
+    // Try to get rates from global context if available
+    const rates = (typeof window !== 'undefined' && window.app && window.app.exchangeRates) || defaultRates;
     
     if (fromCurrency === toCurrency) {
         return amount;
@@ -291,4 +287,17 @@ window.db._convertCurrency = function(amount, fromCurrency, toCurrency) {
     // Convert to USD first, then to target currency
     const usdAmount = amount / rates[fromCurrency];
     return usdAmount * rates[toCurrency];
+}
+
+// Default export object for convenience
+const idb = {
+    openCostsDB,
+    addCost,
+    getReport,
+    setDatabase,
+    getAllCosts,
+    clearAllCosts,
+    convertCurrency
 };
+
+export default idb;

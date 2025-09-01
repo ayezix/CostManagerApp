@@ -10,6 +10,9 @@ class CostManagerApp {
         this.exchangeRateUrl = '';
         this.charts = {};
         
+        // Make app globally available for idb.js currency conversion
+        window.app = this;
+        
         this.init();
     }
 
@@ -254,7 +257,7 @@ class CostManagerApp {
      * Create pie chart using Chart.js
      */
     createPieChart(report, currency) {
-        // Group costs by category
+        // Group costs by category (costs are already converted in the report)
         const categoryTotals = {};
         report.costs.forEach(cost => {
             if (categoryTotals[cost.category]) {
@@ -333,8 +336,8 @@ class CostManagerApp {
             const yearCosts = allCosts.filter(cost => cost.year === year);
             
             yearCosts.forEach(cost => {
-                // Convert to target currency (simplified conversion)
-                const convertedAmount = cost.sum; // Placeholder for actual conversion
+                // Convert to target currency using proper conversion
+                const convertedAmount = this.convertCurrency(cost.sum, cost.currency, currency);
                 monthlyTotals[cost.month - 1] += convertedAmount;
             });
         } catch (error) {
@@ -404,6 +407,8 @@ class CostManagerApp {
         if (savedUrl) {
             document.getElementById('exchange-rate-url').value = savedUrl;
             this.exchangeRateUrl = savedUrl;
+            // Automatically fetch exchange rates if URL is configured
+            this.fetchExchangeRates();
         }
     }
 
@@ -417,6 +422,8 @@ class CostManagerApp {
             localStorage.setItem('exchangeRateUrl', url);
             this.exchangeRateUrl = url;
             this.showMessage('Settings saved successfully!', 'success');
+            // Immediately fetch exchange rates with new URL
+            this.fetchExchangeRates();
         } else {
             this.showMessage('Please enter a valid URL', 'error');
         }

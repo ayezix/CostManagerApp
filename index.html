@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cost Manager</title>
+    <title>Cost Manager - Front End Development Final Project</title>
+    <meta name="description" content="Professional cost management application with IndexedDB storage, multi-currency support, and data visualization">
     <link rel="stylesheet" href="styles.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
@@ -11,7 +12,8 @@
     <div class="container">
         <header>
             <h1>Cost Manager</h1>
-            <p>Track your expenses and analyze your spending patterns</p>
+            <p>Professional expense tracking with multi-currency support and data visualization</p>
+            <small>Front-End Development Final Project - IndexedDB & Chart.js Implementation</small>
         </header>
 
         <nav class="nav-tabs">
@@ -28,38 +30,45 @@
                     <h2>Add New Cost Item</h2>
                     <form id="cost-form">
                         <div class="form-group">
-                            <label for="sum">Amount:</label>
-                            <input type="number" id="sum" name="sum" step="0.01" min="0" required>
+                            <label for="sum">Amount: *</label>
+                            <input type="number" id="sum" name="sum" step="0.01" min="0" max="999999.99" required 
+                                   placeholder="Enter amount (e.g., 25.50)" aria-describedby="sum-help">
+                            <small id="sum-help">Enter the cost amount with up to 2 decimal places</small>
                         </div>
                         
                         <div class="form-group">
-                            <label for="currency">Currency:</label>
-                            <select id="currency" name="currency" required>
-                                <option value="USD">USD</option>
-                                <option value="ILS">ILS</option>
-                                <option value="GBP">GBP</option>
-                                <option value="EURO">EURO</option>
+                            <label for="currency">Currency: *</label>
+                            <select id="currency" name="currency" required aria-describedby="currency-help">
+                                <option value="USD" selected>USD - US Dollar</option>
+                                <option value="ILS">ILS - Israeli Shekel</option>
+                                <option value="GBP">GBP - British Pound</option>
+                                <option value="EURO">EURO - European Euro</option>
                             </select>
+                            <small id="currency-help">Select the currency for this expense</small>
                         </div>
                         
                         <div class="form-group">
-                            <label for="category">Category:</label>
-                            <select id="category" name="category" required>
+                            <label for="category">Category: *</label>
+                            <select id="category" name="category" required aria-describedby="category-help">
                                 <option value="">Select Category</option>
-                                <option value="Food">Food</option>
-                                <option value="Transportation">Transportation</option>
-                                <option value="Entertainment">Entertainment</option>
-                                <option value="Education">Education</option>
-                                <option value="Healthcare">Healthcare</option>
-                                <option value="Shopping">Shopping</option>
-                                <option value="Utilities">Utilities</option>
-                                <option value="Other">Other</option>
+                                <option value="Food">🍕 Food & Dining</option>
+                                <option value="Transportation">🚗 Transportation</option>
+                                <option value="Entertainment">🎬 Entertainment</option>
+                                <option value="Education">📚 Education</option>
+                                <option value="Healthcare">🏥 Healthcare</option>
+                                <option value="Shopping">🛍️ Shopping</option>
+                                <option value="Utilities">⚡ Utilities</option>
+                                <option value="Other">📝 Other</option>
                             </select>
+                            <small id="category-help">Choose the expense category</small>
                         </div>
                         
                         <div class="form-group">
-                            <label for="description">Description:</label>
-                            <input type="text" id="description" name="description" required>
+                            <label for="description">Description: *</label>
+                            <input type="text" id="description" name="description" required maxlength="100"
+                                   placeholder="Enter expense description (e.g., 'Lunch at restaurant')" 
+                                   aria-describedby="description-help">
+                            <small id="description-help">Brief description of the expense (max 100 characters)</small>
                         </div>
                         
                         <button type="submit" class="btn btn-primary">Add Cost Item</button>
@@ -156,14 +165,37 @@
             <!-- Settings Tab -->
             <div id="settings" class="tab-content">
                 <div class="card">
-                    <h2>Settings</h2>
+                    <h2>⚙️ Application Settings</h2>
+                    
                     <div class="form-group">
                         <label for="exchange-rate-url">Exchange Rate API URL:</label>
                         <input type="url" id="exchange-rate-url" name="exchange-rate-url" 
-                               placeholder="https://example.com/exchange-rates.json">
-                        <small>Enter the URL for getting currency exchange rates</small>
+                               placeholder="https://api.example.com/exchange-rates.json"
+                               aria-describedby="url-help">
+                        <small id="url-help">
+                            <strong>Expected JSON format:</strong> <code>{"USD":1, "GBP":1.8, "EURO":0.7, "ILS":3.4}</code><br>
+                            <strong>Requirements:</strong> Must include CORS headers (Access-Control-Allow-Origin: *)
+                        </small>
                     </div>
-                    <button id="save-settings" class="btn btn-primary">Save Settings</button>
+                    
+                    <div class="form-group">
+                        <label>Current Exchange Rates:</label>
+                        <div id="current-rates" style="padding: 10px; background: #f0f0f0; border-radius: 5px; font-family: monospace;">
+                            USD: 1.00, GBP: 1.80, EURO: 0.70, ILS: 3.40 (Default rates)
+                        </div>
+                    </div>
+                    
+                    <button id="save-settings" class="btn btn-primary">💾 Save Settings</button>
+                    
+                    <hr style="margin: 30px 0;">
+                    
+                    <h3>📋 Application Information</h3>
+                    <div style="background: #f8f9fa; padding: 15px; border-radius: 8px;">
+                        <p><strong>Database:</strong> IndexedDB (costsdb)</p>
+                        <p><strong>Supported Currencies:</strong> USD, ILS, GBP, EURO</p>
+                        <p><strong>Charts:</strong> Chart.js Library</p>
+                        <p><strong>Storage:</strong> Local browser storage</p>
+                    </div>
                 </div>
             </div>
         </main>

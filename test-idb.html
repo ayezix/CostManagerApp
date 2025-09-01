@@ -111,9 +111,9 @@
         async function testDatabase() {
             try {
                 showResult('db-result', 'Opening database...', 'info');
-                const db = await window.db.openCostsDB("costsdb", 1);
+                const db = await idb.openCostsDB("costsdb", 1);
                 currentDatabase = db;
-                window.db.setDatabase(db);
+                idb.setDatabase(db);
                 showResult('db-result', 'Database opened successfully!\nDatabase name: ' + db.name + '\nVersion: ' + db.version, 'success');
                 console.log('Database opened:', db);
             } catch (error) {
@@ -131,14 +131,14 @@
 
                 showResult('db-result', 'Adding cost items...', 'info');
                 
-                const result1 = await window.db.addCost({
+                const result1 = await idb.addCost({
                     sum: 200, 
                     currency: "USD", 
                     category: "FOOD",
                     description: "pizza"
                 });
 
-                const result2 = await window.db.addCost({
+                const result2 = await idb.addCost({
                     sum: 400, 
                     currency: "USD", 
                     category: "CAR",
@@ -170,7 +170,7 @@
                 const year = currentDate.getFullYear();
                 const month = currentDate.getMonth() + 1;
                 
-                const report = await window.db.getReport(year, month, "USD");
+                const report = await idb.getReport(year, month, "USD");
                 showResult('db-result', 
                     'Report generated successfully!\n\n' + 
                     JSON.stringify(report, null, 2), 
@@ -191,7 +191,7 @@
                 }
 
                 showResult('db-result', 'Retrieving all costs...', 'info');
-                const allCosts = await window.db.getAllCosts();
+                const allCosts = await idb.getAllCosts();
                 showResult('db-result', 
                     'All costs retrieved successfully!\n\n' + 
                     JSON.stringify(allCosts, null, 2), 
@@ -212,7 +212,7 @@
                 }
 
                 showResult('db-result', 'Clearing database...', 'info');
-                await window.db.clearAllCosts();
+                await idb.clearAllCosts();
                 showResult('db-result', 'Database cleared successfully!', 'success');
                 console.log('Database cleared');
             } catch (error) {
@@ -225,22 +225,22 @@
             try {
                 showResult('sample-result', 'Running sample test from requirements...', 'info');
                 
-                const db = await window.db.openCostsDB("costsdb", 1);
-                window.db.setDatabase(db);
+                const db = await idb.openCostsDB("costsdb", 1);
+                idb.setDatabase(db);
                 currentDatabase = db;
                 
                 if (db) {
                     console.log("creating db succeeded");
                 }
 
-                const result1 = await window.db.addCost({
+                const result1 = await idb.addCost({
                     sum: 200, 
                     currency: "USD", 
                     category: "FOOD",
                     description: "pizza"
                 });
 
-                const result2 = await window.db.addCost({
+                const result2 = await idb.addCost({
                     sum: 400, 
                     currency: "USD", 
                     category: "CAR",

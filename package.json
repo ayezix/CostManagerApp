@@ -1,32 +1,56 @@
 {
   "name": "cost-manager-app",
-  "version": "1.0.0",
-  "description": "A comprehensive cost management web application built with vanilla JavaScript and IndexedDB",
-  "main": "index.html",
+  "version": "2.0.0",
+  "description": "A comprehensive cost management web application built with React, MUI, and IndexedDB - Front-End Development Final Project",
+  "private": true,
+  "dependencies": {
+    "@mui/material": "^5.14.20",
+    "@mui/icons-material": "^5.14.19",
+    "@emotion/react": "^11.11.1",
+    "@emotion/styled": "^11.11.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-scripts": "5.0.1",
+    "chart.js": "^4.4.0",
+    "react-chartjs-2": "^5.2.0"
+  },
   "scripts": {
-    "start": "python -m http.server 8000",
-    "serve": "npx http-server -p 8000",
-    "test": "echo \"Open test-idb.html in your browser to test the idb.js library\""
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject",
+    "serve-static": "npx serve -s build -l 3000"
   },
   "keywords": [
     "cost-manager",
     "expense-tracker",
     "indexeddb",
-    "vanilla-javascript",
+    "react",
+    "mui",
     "charts",
-    "financial-app"
+    "financial-app",
+    "front-end-project"
   ],
   "author": "Cost Manager Development Team",
   "license": "MIT",
   "devDependencies": {
-    "http-server": "^14.1.1"
+    "@types/react": "^18.2.43",
+    "@types/react-dom": "^18.2.17"
   },
-  "browserslist": [
-    "> 1%",
-    "last 2 versions",
-    "not dead"
-  ],
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
   "engines": {
-    "node": ">=14.0.0"
+    "node": ">=16.0.0",
+    "npm": ">=8.0.0"
   }
 }

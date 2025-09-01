@@ -9,7 +9,7 @@ body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     line-height: 1.6;
     color: #333;
-    background: linear-gradient(135deg, #ff7b3d 0%, #e65100 100%);
+    background: linear-gradient(135deg, #64b5f6 0%, #1976d2 100%);
     min-height: 100vh;
 }
 
@@ -66,7 +66,7 @@ header p {
 }
 
 .nav-tab.active {
-    background: #ff7b3d;
+    background: #64b5f6;
     color: white;
     box-shadow: 0 2px 4px rgba(0,0,0,0.2);
 }
@@ -98,7 +98,7 @@ header p {
     color: #333;
     margin-bottom: 25px;
     font-size: 1.8rem;
-    border-bottom: 2px solid #ff7b3d;
+    border-bottom: 2px solid #64b5f6;
     padding-bottom: 10px;
 }
 
@@ -133,8 +133,8 @@ header p {
 .form-group input:focus,
 .form-group select:focus {
     outline: none;
-    border-color: #ff7b3d;
-    box-shadow: 0 0 0 3px rgba(255, 123, 61, 0.1);
+    border-color: #64b5f6;
+    box-shadow: 0 0 0 3px rgba(100, 181, 246, 0.1);
 }
 
 .form-group small {
@@ -158,12 +158,12 @@ header p {
 }
 
 .btn-primary {
-    background: #ff7b3d;
+    background: #64b5f6;
     color: white;
 }
 
 .btn-primary:hover {
-    background: #f57c00;
+    background: #42a5f5;
     transform: translateY(-1px);
     box-shadow: 0 4px 8px rgba(0,0,0,0.2);
 }
@@ -206,7 +206,7 @@ header p {
     padding: 20px;
     background: #f8f9fa;
     border-radius: 8px;
-    border-left: 4px solid #ff7b3d;
+    border-left: 4px solid #64b5f6;
 }
 
 .cost-item {
@@ -230,12 +230,12 @@ header p {
 
 .cost-amount {
     font-weight: 600;
-    color: #ff7b3d;
+    color: #64b5f6;
     font-size: 1.1rem;
 }
 
 .cost-category {
-    background: #ff7b3d;
+    background: #64b5f6;
     color: white;
     padding: 4px 12px;
     border-radius: 20px;
@@ -256,7 +256,7 @@ header p {
 .total-amount {
     text-align: center;
     padding: 20px;
-    background: #ff7b3d;
+    background: #64b5f6;
     color: white;
     border-radius: 8px;
     margin-top: 20px;
@@ -324,7 +324,7 @@ header p {
     width: 20px;
     height: 20px;
     border: 3px solid #f3f3f3;
-    border-top: 3px solid #ff7b3d;
+    border-top: 3px solid #64b5f6;
     border-radius: 50%;
     animation: spin 1s linear infinite;
     margin-left: 10px;
