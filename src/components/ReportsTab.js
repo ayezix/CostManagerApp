@@ -96,20 +96,32 @@ function ReportsTab({ showMessage, idb }) {
   };
 
   return (
-    <Box>
-      {/* Controls */}
-      <Paper elevation={3} sx={{ p: 3, mb: 3 }}>
-        <Box sx={{ mb: 3, textAlign: 'center' }}>
-          <ReportIcon sx={{ fontSize: 48, color: 'primary.main', mb: 1 }} />
-          <Typography variant="h4" component="h2" gutterBottom>
-            Monthly Report
-          </Typography>
-          <Typography variant="body1" color="text.secondary">
-            Generate detailed expense reports for specific months and years
-          </Typography>
+    <Box sx={{ maxWidth: 800, mx: 'auto' }}>
+      <Box sx={{ mb: 4, textAlign: 'center' }}>
+        <Box sx={{ 
+          width: 80, 
+          height: 80, 
+          borderRadius: '50%', 
+          bgcolor: 'primary.light', 
+          display: 'flex', 
+          alignItems: 'center', 
+          justifyContent: 'center',
+          mx: 'auto',
+          mb: 2
+        }}>
+          <ReportIcon sx={{ fontSize: 40, color: 'white' }} />
         </Box>
+        <Typography variant="h4" gutterBottom>
+          Monthly Reports
+        </Typography>
+        <Typography variant="body1" color="text.secondary">
+          Generate detailed expense reports for specific months and years
+        </Typography>
+      </Box>
 
-        <Grid container spacing={3} alignItems="flex-end">
+      <Paper elevation={0} sx={{ p: 4, mb: 3, bgcolor: 'grey.50', borderRadius: 3 }}>
+
+        <Grid container spacing={3}>
           <Grid item xs={12} sm={4}>
             <FormControl fullWidth>
               <InputLabel>Year</InputLabel>
@@ -117,17 +129,14 @@ function ReportsTab({ showMessage, idb }) {
                 value={year}
                 label="Year"
                 onChange={(e) => setYear(e.target.value)}
-                startAdornment={<CalendarIcon sx={{ mr: 1, color: 'action.active' }} />}
+                sx={{ bgcolor: 'white' }}
               >
                 {years.map((y) => (
-                  <MenuItem key={y} value={y}>
-                    {y}
-                  </MenuItem>
+                  <MenuItem key={y} value={y}>{y}</MenuItem>
                 ))}
               </Select>
             </FormControl>
           </Grid>
-
           <Grid item xs={12} sm={4}>
             <FormControl fullWidth>
               <InputLabel>Month</InputLabel>
@@ -135,17 +144,14 @@ function ReportsTab({ showMessage, idb }) {
                 value={month}
                 label="Month"
                 onChange={(e) => setMonth(e.target.value)}
-                startAdornment={<CalendarIcon sx={{ mr: 1, color: 'action.active' }} />}
+                sx={{ bgcolor: 'white' }}
               >
                 {months.map((m) => (
-                  <MenuItem key={m.value} value={m.value}>
-                    {m.name}
-                  </MenuItem>
+                  <MenuItem key={m.value} value={m.value}>{m.name}</MenuItem>
                 ))}
               </Select>
             </FormControl>
           </Grid>
-
           <Grid item xs={12} sm={4}>
             <FormControl fullWidth>
               <InputLabel>Currency</InputLabel>
@@ -153,17 +159,14 @@ function ReportsTab({ showMessage, idb }) {
                 value={currency}
                 label="Currency"
                 onChange={(e) => setCurrency(e.target.value)}
-                startAdornment={<CurrencyIcon sx={{ mr: 1, color: 'action.active' }} />}
+                sx={{ bgcolor: 'white' }}
               >
                 {currencies.map((c) => (
-                  <MenuItem key={c} value={c}>
-                    {c}
-                  </MenuItem>
+                  <MenuItem key={c} value={c}>{c}</MenuItem>
                 ))}
               </Select>
             </FormControl>
           </Grid>
-
           <Grid item xs={12}>
             <Button
               variant="contained"
@@ -172,7 +175,15 @@ function ReportsTab({ showMessage, idb }) {
               disabled={loading}
               startIcon={<ReportIcon />}
               fullWidth
-              sx={{ py: 1.5, fontSize: '1.1rem', fontWeight: 600 }}
+              sx={{ 
+                py: 1.5, 
+                fontSize: '1.1rem', 
+                fontWeight: 600,
+                boxShadow: '0 4px 12px rgba(25, 118, 210, 0.3)',
+                '&:hover': {
+                  boxShadow: '0 6px 16px rgba(25, 118, 210, 0.4)'
+                }
+              }}
             >
               {loading ? 'Generating Report...' : 'Generate Report'}
             </Button>
@@ -182,7 +193,7 @@ function ReportsTab({ showMessage, idb }) {
 
       {/* Report Results */}
       {report && (
-        <Paper elevation={3} sx={{ p: 3 }}>
+        <Paper elevation={0} sx={{ p: 4, bgcolor: 'background.paper', borderRadius: 3, boxShadow: '0 4px 20px rgba(0,0,0,0.1)' }}>
           <Typography variant="h5" gutterBottom sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
             <ReceiptIcon sx={{ mr: 1 }} />
             Report for {getMonthName(report.month)} {report.year}

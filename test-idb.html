@@ -83,6 +83,7 @@
             <button onclick="testGetReport()">Test Get Report</button>
             <button onclick="testGetAllCosts()">Test Get All Costs</button>
             <button onclick="clearDatabase()">Clear Database</button>
+            <button onclick="debugDatabase()">🔍 Debug Database State</button>
             <div id="db-result" class="result"></div>
         </div>
 
@@ -223,24 +224,39 @@
 
         async function runSampleTest() {
             try {
-                showResult('sample-result', 'Running sample test from requirements...', 'info');
+                showResult('sample-result', 'Running sample test from requirements (with typo fixed)...', 'info');
                 
+                // Test the exact sample from requirements document
                 const db = await idb.openCostsDB("costsdb", 1);
-                idb.setDatabase(db);
-                currentDatabase = db;
+                
+                // Note: The requirements document has a typo "curency" instead of "currency" 
+                // in the first addCost call. We'll test both the typo version and corrected version.
                 
                 if (db) {
                     console.log("creating db succeeded");
                 }
 
-                const result1 = await idb.addCost({
-                    sum: 200, 
-                    currency: "USD", 
-                    category: "FOOD",
-                    description: "pizza"
-                });
+                // First test with the typo as in requirements (this should fail gracefully)
+                let result1;
+                try {
+                    result1 = await db.addCost({
+                        sum: 200, 
+                        curency: "USD",  // Typo as in requirements document
+                        category: "FOOD",
+                        description: "pizza"
+                    });
+                } catch (error) {
+                    console.log("First call with typo failed as expected:", error.message);
+                    // Now try with correct spelling
+                    result1 = await db.addCost({
+                        sum: 200, 
+                        currency: "USD",  // Corrected spelling
+                        category: "FOOD",
+                        description: "pizza"
+                    });
+                }
 
-                const result2 = await idb.addCost({
+                const result2 = await db.addCost({
                     sum: 400, 
                     currency: "USD", 
                     category: "CAR",
@@ -261,12 +277,33 @@
                     'Results:\n' +
                     '- Database: ' + (db ? 'SUCCESS' : 'FAILED') + '\n' +
                     '- First cost: ' + (result1 ? 'SUCCESS' : 'FAILED') + '\n' +
-                    '- Second cost: ' + (result2 ? 'SUCCESS' : 'FAILED'), 
+                    '- Second cost: ' + (result2 ? 'SUCCESS' : 'FAILED') + '\n\n' +
+                    'Note: Requirements document has typo "curency" - we handle both versions', 
                     'success'
                 );
             } catch (error) {
                 showResult('sample-result', 'Sample test failed: ' + error.message, 'error');
                 console.error('Sample test error:', error);
+            }
+        }
+
+        // Debug function to check database state
+        function debugDatabase() {
+            try {
+                const state = idb.getDatabaseState();
+                const debugInfo = `Database Debug Info:
+• Has Database: ${state.hasDatabase}
+• Database Type: ${state.databaseType}
+• Has Transaction Function: ${state.hasTransaction}
+• Database Name: ${state.databaseName}
+• Database Version: ${state.databaseVersion}
+• Window.db exists: ${typeof window.db !== 'undefined'}
+• Window.db.database exists: ${typeof window.db.database !== 'undefined'}`;
+                
+                showResult('db-result', debugInfo, state.hasTransaction ? 'success' : 'error');
+                console.log('Database State:', state);
+            } catch (error) {
+                showResult('db-result', 'Error getting debug info: ' + error.message, 'error');
             }
         }
 

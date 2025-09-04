@@ -10,23 +10,19 @@ import {
   Button,
   Box,
   Grid,
-  InputAdornment,
-  FormHelperText
+  InputAdornment
 } from '@mui/material';
-import {
-  AddCard as AddIcon,
-  AttachMoney as MoneyIcon
-} from '@mui/icons-material';
+import { AddCard as AddIcon, AttachMoney as MoneyIcon } from '@mui/icons-material';
 
 const categories = [
-  { value: 'Food', label: '🍕 Food & Dining', icon: '🍕' },
-  { value: 'Transportation', label: '🚗 Transportation', icon: '🚗' },
-  { value: 'Entertainment', label: '🎬 Entertainment', icon: '🎬' },
-  { value: 'Education', label: '📚 Education', icon: '📚' },
-  { value: 'Healthcare', label: '🏥 Healthcare', icon: '🏥' },
-  { value: 'Shopping', label: '🛍️ Shopping', icon: '🛍️' },
-  { value: 'Utilities', label: '⚡ Utilities', icon: '⚡' },
-  { value: 'Other', label: '📝 Other', icon: '📝' }
+  { value: 'Food', label: '🍕 Food & Dining' },
+  { value: 'Transportation', label: '🚗 Transportation' },
+  { value: 'Entertainment', label: '🎬 Entertainment' },
+  { value: 'Education', label: '📚 Education' },
+  { value: 'Healthcare', label: '🏥 Healthcare' },
+  { value: 'Shopping', label: '🛍️ Shopping' },
+  { value: 'Utilities', label: '⚡ Utilities' },
+  { value: 'Other', label: '📝 Other' }
 ];
 
 const currencies = [
@@ -38,221 +34,167 @@ const currencies = [
 
 function AddCostTab({ showMessage, idb }) {
   const [formData, setFormData] = useState({
-    sum: '',
-    currency: 'USD',
-    category: '',
-    description: ''
+    sum: '', currency: 'USD', category: '', description: ''
   });
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
 
   const handleChange = (field) => (event) => {
-    const value = event.target.value;
-    setFormData(prev => ({
-      ...prev,
-      [field]: value
-    }));
-    
-    // Clear error when user starts typing
-    if (errors[field]) {
-      setErrors(prev => ({
-        ...prev,
-        [field]: ''
-      }));
-    }
+    setFormData(prev => ({ ...prev, [field]: event.target.value }));
+    if (errors[field]) setErrors(prev => ({ ...prev, [field]: '' }));
   };
 
   const validateForm = () => {
     const newErrors = {};
-
-    if (!formData.sum || parseFloat(formData.sum) <= 0) {
-      newErrors.sum = 'Please enter a valid amount greater than 0';
-    }
-
-    if (!formData.currency) {
-      newErrors.currency = 'Please select a currency';
-    }
-
-    if (!formData.category) {
-      newErrors.category = 'Please select a category';
-    }
-
-    if (!formData.description.trim()) {
-      newErrors.description = 'Please enter a description';
-    } else if (formData.description.length > 100) {
-      newErrors.description = 'Description must be 100 characters or less';
-    }
-
+    if (!formData.sum || parseFloat(formData.sum) <= 0) newErrors.sum = 'Enter valid amount';
+    if (!formData.currency) newErrors.currency = 'Select currency';
+    if (!formData.category) newErrors.category = 'Select category';
+    if (!formData.description.trim()) newErrors.description = 'Enter description';
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
   const handleSubmit = async (event) => {
     event.preventDefault();
+    if (!validateForm()) return;
     
-    if (!validateForm()) {
-      showMessage('Please fix the errors in the form', 'error');
-      return;
-    }
-
     setLoading(true);
-
     try {
-      const costData = {
+      await idb.addCost({
         sum: parseFloat(formData.sum),
         currency: formData.currency,
         category: formData.category,
         description: formData.description.trim()
-      };
-
-      const result = await idb.addCost(costData);
-      showMessage('Cost item added successfully!', 'success');
-      
-      // Reset form
-      setFormData({
-        sum: '',
-        currency: 'USD',
-        category: '',
-        description: ''
       });
-      
-      console.log('Added cost item:', result);
+      showMessage('Cost added successfully!', 'success');
+      setFormData({ sum: '', currency: 'USD', category: '', description: '' });
     } catch (error) {
-      console.error('Failed to add cost item:', error);
-      showMessage('Failed to add cost item: ' + error.message, 'error');
+      showMessage('Error: ' + error.message, 'error');
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <Paper elevation={3} sx={{ p: 4, maxWidth: 600, mx: 'auto' }}>
-      <Box sx={{ mb: 3, textAlign: 'center' }}>
-        <AddIcon sx={{ fontSize: 48, color: 'primary.main', mb: 1 }} />
-        <Typography variant="h4" component="h2" gutterBottom>
-          Add New Cost Item
+    <Box sx={{ maxWidth: 600, mx: 'auto' }}>
+      <Box sx={{ mb: 4, textAlign: 'center' }}>
+        <Box sx={{ 
+          width: 80, 
+          height: 80, 
+          borderRadius: '50%', 
+          bgcolor: 'primary.light', 
+          display: 'flex', 
+          alignItems: 'center', 
+          justifyContent: 'center',
+          mx: 'auto',
+          mb: 2
+        }}>
+          <AddIcon sx={{ fontSize: 40, color: 'white' }} />
+        </Box>
+        <Typography variant="h4" gutterBottom>
+          Add New Expense
         </Typography>
         <Typography variant="body1" color="text.secondary">
-          Track your expenses with detailed information and automatic date recording
+          Track your spending with detailed information
         </Typography>
       </Box>
 
-      <Box component="form" onSubmit={handleSubmit} noValidate>
-        <Grid container spacing={3}>
-          {/* Amount Field */}
-          <Grid item xs={12} sm={6}>
-            <TextField
-              fullWidth
-              label="Amount *"
-              type="number"
-              value={formData.sum}
-              onChange={handleChange('sum')}
-              error={!!errors.sum}
-              helperText={errors.sum || 'Enter the cost amount with up to 2 decimal places'}
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <MoneyIcon />
-                  </InputAdornment>
-                ),
-                inputProps: {
-                  min: 0,
-                  step: 0.01,
-                  max: 999999.99
-                }
-              }}
-              placeholder="25.50"
-              required
-            />
-          </Grid>
-
-          {/* Currency Field */}
-          <Grid item xs={12} sm={6}>
-            <FormControl fullWidth error={!!errors.currency}>
-              <InputLabel>Currency *</InputLabel>
-              <Select
-                value={formData.currency}
-                label="Currency *"
-                onChange={handleChange('currency')}
+      <Paper elevation={0} sx={{ p: 4, bgcolor: 'grey.50', borderRadius: 3 }}>
+        <Box component="form" onSubmit={handleSubmit}>
+          <Grid container spacing={3}>
+            <Grid item xs={12} sm={6}>
+              <TextField
+                fullWidth
+                label="Amount *"
+                type="number"
+                value={formData.sum}
+                onChange={handleChange('sum')}
+                error={!!errors.sum}
+                helperText={errors.sum || 'Enter the cost amount'}
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <MoneyIcon color="primary" />
+                    </InputAdornment>
+                  ),
+                  inputProps: { min: 0, step: 0.01 }
+                }}
+                sx={{ '& .MuiOutlinedInput-root': { bgcolor: 'white' } }}
                 required
-              >
-                {currencies.map((currency) => (
-                  <MenuItem key={currency.value} value={currency.value}>
-                    {currency.label}
+              />
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <FormControl fullWidth error={!!errors.currency}>
+                <InputLabel>Currency *</InputLabel>
+                <Select 
+                  value={formData.currency} 
+                  label="Currency *" 
+                  onChange={handleChange('currency')}
+                  sx={{ bgcolor: 'white' }}
+                >
+                  {currencies.map(c => (
+                    <MenuItem key={c.value} value={c.value}>{c.label}</MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </Grid>
+            <Grid item xs={12}>
+              <FormControl fullWidth error={!!errors.category}>
+                <InputLabel>Category *</InputLabel>
+                <Select 
+                  value={formData.category} 
+                  label="Category *" 
+                  onChange={handleChange('category')}
+                  sx={{ bgcolor: 'white' }}
+                >
+                  <MenuItem value="">
+                    <em>Select Category</em>
                   </MenuItem>
-                ))}
-              </Select>
-              <FormHelperText>
-                {errors.currency || 'Select the currency for this expense'}
-              </FormHelperText>
-            </FormControl>
-          </Grid>
-
-          {/* Category Field */}
-          <Grid item xs={12}>
-            <FormControl fullWidth error={!!errors.category}>
-              <InputLabel>Category *</InputLabel>
-              <Select
-                value={formData.category}
-                label="Category *"
-                onChange={handleChange('category')}
+                  {categories.map(c => (
+                    <MenuItem key={c.value} value={c.value}>{c.label}</MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </Grid>
+            <Grid item xs={12}>
+              <TextField
+                fullWidth
+                label="Description *"
+                value={formData.description}
+                onChange={handleChange('description')}
+                error={!!errors.description}
+                helperText={errors.description || `${formData.description.length}/100 characters`}
+                multiline
+                rows={3}
+                inputProps={{ maxLength: 100 }}
+                sx={{ '& .MuiOutlinedInput-root': { bgcolor: 'white' } }}
                 required
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <Button
+                type="submit"
+                variant="contained"
+                size="large"
+                fullWidth
+                disabled={loading}
+                startIcon={<AddIcon />}
+                sx={{ 
+                  py: 1.5,
+                  fontSize: '1.1rem',
+                  boxShadow: '0 4px 12px rgba(25, 118, 210, 0.3)',
+                  '&:hover': {
+                    boxShadow: '0 6px 16px rgba(25, 118, 210, 0.4)'
+                  }
+                }}
               >
-                <MenuItem value="">
-                  <em>Select Category</em>
-                </MenuItem>
-                {categories.map((category) => (
-                  <MenuItem key={category.value} value={category.value}>
-                    {category.label}
-                  </MenuItem>
-                ))}
-              </Select>
-              <FormHelperText>
-                {errors.category || 'Choose the expense category'}
-              </FormHelperText>
-            </FormControl>
+                {loading ? 'Adding Expense...' : 'Add Expense'}
+              </Button>
+            </Grid>
           </Grid>
-
-          {/* Description Field */}
-          <Grid item xs={12}>
-            <TextField
-              fullWidth
-              label="Description *"
-              value={formData.description}
-              onChange={handleChange('description')}
-              error={!!errors.description}
-              helperText={errors.description || `Brief description of the expense (${formData.description.length}/100 characters)`}
-              placeholder="Enter expense description (e.g., 'Lunch at restaurant')"
-              inputProps={{
-                maxLength: 100
-              }}
-              multiline
-              rows={2}
-              required
-            />
-          </Grid>
-
-          {/* Submit Button */}
-          <Grid item xs={12}>
-            <Button
-              type="submit"
-              variant="contained"
-              size="large"
-              fullWidth
-              disabled={loading}
-              startIcon={<AddIcon />}
-              sx={{
-                py: 1.5,
-                fontSize: '1.1rem',
-                fontWeight: 600
-              }}
-            >
-              {loading ? 'Adding Cost Item...' : 'Add Cost Item'}
-            </Button>
-          </Grid>
-        </Grid>
-      </Box>
-    </Paper>
+        </Box>
+      </Paper>
+    </Box>
   );
 }
 
