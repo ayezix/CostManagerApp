@@ -72,7 +72,3 @@ This project fully implements all specifications from the Front-End Development 
 7. ✅ Multi-currency support (USD, ILS, GBP, EURO)
 8. ✅ Exchange rate API integration
 9. ✅ Settings configuration
-
-## License
-
-MIT - Educational project for Front-End Development course.
