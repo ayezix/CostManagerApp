@@ -1,3 +1,6 @@
+// SettingsTab.js - Simple Student Version
+// This creates the settings page where users can configure the exchange rate URL
+
 import React, { useState } from 'react';
 import {
   Paper,
@@ -8,226 +11,226 @@ import {
   Grid,
   Card,
   CardContent,
-  Divider,
   Chip,
   Alert,
-  List,
-  ListItem,
-  ListItemIcon,
-  ListItemText
+  Divider
 } from '@mui/material';
-import {
-  Settings as SettingsIcon,
-  Save as SaveIcon,
-  Language as ApiIcon,
-  Storage as DatabaseIcon,
-  Assessment as ChartsIcon,
-  Security as SecurityIcon,
-  Info as InfoIcon
-} from '@mui/icons-material';
+import { Save as SaveIcon, Settings as SettingsIcon } from '@mui/icons-material';
 
 function SettingsTab({ showMessage, exchangeRateUrl, exchangeRates, onSaveSettings }) {
-  const [url, setUrl] = useState(exchangeRateUrl || '');
+  // Store the URL the user types
+  const [url, setUrl] = useState(exchangeRateUrl);
 
-  const handleSaveSettings = () => {
-    if (url.trim()) {
-      try {
-        new URL(url.trim()); // Validate URL
-        onSaveSettings(url.trim());
-      } catch (error) {
-        showMessage('Please enter a valid URL', 'error');
-      }
-    } else {
+  // Function to save the URL when user clicks Save button
+  const handleSave = () => {
+    if (url && !isValidUrl(url)) {
       showMessage('Please enter a valid URL', 'error');
+      return;
+    }
+    onSaveSettings(url);
+  };
+
+  // Helper function to check if URL is valid
+  const isValidUrl = (string) => {
+    try {
+      new URL(string);
+      return true;
+    } catch (_) {
+      return false;
     }
   };
 
-  const formatRates = (rates) => {
-    return Object.entries(rates)
-      .map(([currency, rate]) => `${currency}: ${rate.toFixed(2)}`)
-      .join(', ');
+  // Helper function to show exchange rates nicely (4 decimal places)
+  const formatRate = (rate) => {
+    return typeof rate === 'number' ? rate.toFixed(4) : rate;
   };
 
   return (
     <Box>
-      {/* Header */}
-      <Box sx={{ mb: 3, textAlign: 'center' }}>
-        <SettingsIcon sx={{ fontSize: 48, color: 'primary.main', mb: 1 }} />
-        <Typography variant="h4" component="h2" gutterBottom>
-          Application Settings
+      <Paper elevation={2} sx={{ p: 3, mb: 3 }}>
+        <Typography variant="h5" gutterBottom color="primary">
+          ⚙️ Application Settings
         </Typography>
-        <Typography variant="body1" color="text.secondary">
-          Configure exchange rate API and view application information
+        <Typography variant="body2" color="text.secondary" paragraph>
+          Configure the exchange rate API URL and view current rates.
         </Typography>
-      </Box>
 
-      <Grid container spacing={3}>
-        {/* Exchange Rate API Settings */}
-        <Grid item xs={12} md={8}>
-          <Paper elevation={3} sx={{ p: 3, mb: 3 }}>
-            <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center' }}>
-              <ApiIcon sx={{ mr: 1 }} />
-              Exchange Rate API Configuration
-            </Typography>
-            
-            <Grid container spacing={2}>
-              <Grid item xs={12}>
-                <TextField
-                  fullWidth
-                  label="Exchange Rate API URL"
-                  value={url}
-                  onChange={(e) => setUrl(e.target.value)}
-                  placeholder="https://api.example.com/exchange-rates.json"
-                  helperText="Enter the URL for getting currency exchange rates"
-                  variant="outlined"
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <Button
-                  variant="contained"
-                  startIcon={<SaveIcon />}
-                  onClick={handleSaveSettings}
-                  size="large"
-                  sx={{ mr: 2 }}
-                >
-                  Save Settings
-                </Button>
-              </Grid>
+        <Grid container spacing={3}>
+          <Grid item xs={12}>
+            <TextField
+              fullWidth
+              label="Exchange Rate API URL"
+              placeholder="https://api.example.com/exchange-rates.json"
+              value={url}
+              onChange={(e) => setUrl(e.target.value)}
+              helperText='URL should return JSON with format: {"USD":1, "GBP":1.8, "EURO":0.7, "ILS":3.4}'
+              type="url"
+            />
+          </Grid>
+
+          <Grid item xs={12}>
+            <Button
+              variant="contained"
+              size="large"
+              startIcon={<SaveIcon />}
+              onClick={handleSave}
+              sx={{ mr: 2 }}
+            >
+              💾 Save Settings
+            </Button>
+            <Button
+              variant="outlined"
+              size="large"
+              onClick={() => setUrl('')}
+            >
+              Clear URL
+            </Button>
+          </Grid>
+        </Grid>
+
+        <Alert severity="info" sx={{ mt: 3 }}>
+          <Typography variant="subtitle2" gutterBottom>
+            <strong>Expected JSON Format:</strong>
+          </Typography>
+          <Typography variant="body2" component="pre" sx={{ fontFamily: 'monospace', mt: 1 }}>
+            {`{"USD": 1, "GBP": 1.8, "EURO": 0.7, "ILS": 3.4}`}
+          </Typography>
+          <Typography variant="body2" sx={{ mt: 1 }}>
+            <strong>Requirements:</strong> Must include CORS headers (Access-Control-Allow-Origin: *)
+          </Typography>
+        </Alert>
+      </Paper>
+
+      <Paper elevation={2} sx={{ p: 3, mb: 3 }}>
+        <Typography variant="h6" gutterBottom>
+          Current Exchange Rates
+        </Typography>
+        <Typography variant="body2" color="text.secondary" paragraph>
+          These are the exchange rates currently being used for currency conversion.
+        </Typography>
+
+        <Grid container spacing={2}>
+          {Object.entries(exchangeRates).map(([currency, rate]) => (
+            <Grid item key={currency}>
+              <Chip
+                label={`${currency}: ${formatRate(rate)}`}
+                variant="outlined"
+                color="primary"
+                sx={{ fontSize: '0.9rem', px: 1 }}
+              />
             </Grid>
+          ))}
+        </Grid>
 
-            <Divider sx={{ my: 3 }} />
+        {exchangeRateUrl && (
+          <Alert severity="success" sx={{ mt: 2 }}>
+            <Typography variant="body2">
+              <strong>Source:</strong> {exchangeRateUrl}
+            </Typography>
+          </Alert>
+        )}
 
-            <Alert severity="info" sx={{ mb: 2 }}>
-              <Typography variant="subtitle2" gutterBottom>
-                <strong>Expected JSON Format:</strong>
-              </Typography>
-              <Box sx={{ 
-                fontFamily: 'monospace', 
-                bgcolor: 'grey.100', 
-                p: 1, 
-                borderRadius: 1,
-                fontSize: '0.875rem'
-              }}>
-                {"{"}"USD":1, "GBP":1.8, "EURO":0.7, "ILS":3.4{"}"}
-              </Box>
-            </Alert>
+        {!exchangeRateUrl && (
+          <Alert severity="warning" sx={{ mt: 2 }}>
+            <Typography variant="body2">
+              <strong>Using default rates.</strong> Configure an API URL above to get live exchange rates.
+            </Typography>
+          </Alert>
+        )}
+      </Paper>
 
-            <Alert severity="warning">
-              <Typography variant="body2">
-                <strong>Requirements:</strong> The API must include CORS headers (Access-Control-Allow-Origin: *)
-              </Typography>
-            </Alert>
-          </Paper>
+      <Paper elevation={2} sx={{ p: 3, mb: 3 }}>
+        <Typography variant="h6" gutterBottom>
+          📋 Application Information
+        </Typography>
+        <Grid container spacing={2}>
+          <Grid item xs={12} sm={6}>
+            <Card variant="outlined">
+              <CardContent>
+                <Typography variant="subtitle2" color="text.secondary">
+                  Database
+                </Typography>
+                <Typography variant="body1">
+                  IndexedDB (costsdb)
+                </Typography>
+              </CardContent>
+            </Card>
+          </Grid>
+          <Grid item xs={12} sm={6}>
+            <Card variant="outlined">
+              <CardContent>
+                <Typography variant="subtitle2" color="text.secondary">
+                  Supported Currencies
+                </Typography>
+                <Typography variant="body1">
+                  USD, ILS, GBP, EURO
+                </Typography>
+              </CardContent>
+            </Card>
+          </Grid>
+          <Grid item xs={12} sm={6}>
+            <Card variant="outlined">
+              <CardContent>
+                <Typography variant="subtitle2" color="text.secondary">
+                  Charts
+                </Typography>
+                <Typography variant="body1">
+                  Chart.js Library
+                </Typography>
+              </CardContent>
+            </Card>
+          </Grid>
+          <Grid item xs={12} sm={6}>
+            <Card variant="outlined">
+              <CardContent>
+                <Typography variant="subtitle2" color="text.secondary">
+                  Storage
+                </Typography>
+                <Typography variant="body1">
+                  Local browser storage
+                </Typography>
+              </CardContent>
+            </Card>
+          </Grid>
+        </Grid>
+      </Paper>
 
-          {/* Current Exchange Rates */}
-          <Paper elevation={3} sx={{ p: 3 }}>
-            <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center' }}>
-              <ApiIcon sx={{ mr: 1 }} />
-              Current Exchange Rates
+      <Paper elevation={2} sx={{ p: 3 }}>
+        <Typography variant="h6" gutterBottom>
+          🎓 Project Information
+        </Typography>
+        <Typography variant="body2" color="text.secondary" paragraph>
+          This is the Cost Manager Final Project for Front-End Development course.
+        </Typography>
+        
+        <Divider sx={{ my: 2 }} />
+
+        <Alert severity="success" variant="outlined">
+          <Typography variant="body2">
+            <strong>React + MUI Implementation</strong><br />
+            Front-End Development Final Project<br />
+            Version 2.0 - Full requirements compliance
+          </Typography>
+        </Alert>
+
+        {/* Technology Stack */}
+        <Card variant="outlined" sx={{ mt: 2 }}>
+          <CardContent>
+            <Typography variant="h6" gutterBottom>
+              Technology Stack
             </Typography>
             
-            <Box sx={{ 
-              bgcolor: 'grey.50', 
-              p: 2, 
-              borderRadius: 1,
-              fontFamily: 'monospace',
-              fontSize: '1rem'
-            }}>
-              {formatRates(exchangeRates)}
-              {!exchangeRateUrl && (
-                <Chip 
-                  label="Default rates" 
-                  size="small" 
-                  color="info" 
-                  sx={{ ml: 1 }}
-                />
-              )}
+            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+              <Chip label="React 18" color="primary" variant="outlined" />
+              <Chip label="Material-UI v5" color="primary" variant="outlined" />
+              <Chip label="Chart.js" color="secondary" variant="outlined" />
+              <Chip label="IndexedDB" color="secondary" variant="outlined" />
+              <Chip label="JavaScript ES6+" color="info" variant="outlined" />
+              <Chip label="Responsive Design" color="success" variant="outlined" />
             </Box>
-          </Paper>
-        </Grid>
-
-        {/* Application Information */}
-        <Grid item xs={12} md={4}>
-          <Card elevation={3} sx={{ height: 'fit-content' }}>
-            <CardContent>
-              <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center' }}>
-                <InfoIcon sx={{ mr: 1 }} />
-                Application Information
-              </Typography>
-              
-              <List dense>
-                <ListItem>
-                  <ListItemIcon>
-                    <DatabaseIcon color="primary" />
-                  </ListItemIcon>
-                  <ListItemText
-                    primary="Database"
-                    secondary="IndexedDB (costsdb v1)"
-                  />
-                </ListItem>
-                
-                <ListItem>
-                  <ListItemIcon>
-                    <ApiIcon color="primary" />
-                  </ListItemIcon>
-                  <ListItemText
-                    primary="Supported Currencies"
-                    secondary="USD, ILS, GBP, EURO"
-                  />
-                </ListItem>
-                
-                <ListItem>
-                  <ListItemIcon>
-                    <ChartsIcon color="primary" />
-                  </ListItemIcon>
-                  <ListItemText
-                    primary="Charts"
-                    secondary="Chart.js with React integration"
-                  />
-                </ListItem>
-                
-                <ListItem>
-                  <ListItemIcon>
-                    <SecurityIcon color="primary" />
-                  </ListItemIcon>
-                  <ListItemText
-                    primary="Storage"
-                    secondary="Local browser storage"
-                  />
-                </ListItem>
-              </List>
-
-              <Divider sx={{ my: 2 }} />
-
-              <Alert severity="success" variant="outlined">
-                <Typography variant="body2">
-                  <strong>React & MUI Implementation</strong><br />
-                  Front-End Development Final Project<br />
-                  Version 2.0 - Full requirements compliance
-                </Typography>
-              </Alert>
-            </CardContent>
-          </Card>
-
-          {/* Technology Stack */}
-          <Card elevation={3} sx={{ mt: 2 }}>
-            <CardContent>
-              <Typography variant="h6" gutterBottom>
-                Technology Stack
-              </Typography>
-              
-              <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
-                <Chip label="React 18" color="primary" variant="outlined" />
-                <Chip label="Material-UI v5" color="primary" variant="outlined" />
-                <Chip label="Chart.js" color="secondary" variant="outlined" />
-                <Chip label="IndexedDB" color="secondary" variant="outlined" />
-                <Chip label="JavaScript ES6+" color="info" variant="outlined" />
-                <Chip label="Responsive Design" color="success" variant="outlined" />
-              </Box>
-            </CardContent>
-          </Card>
-        </Grid>
-      </Grid>
+          </CardContent>
+        </Card>
+      </Paper>
     </Box>
   );
 }

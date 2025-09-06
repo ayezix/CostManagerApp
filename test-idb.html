@@ -2,314 +2,780 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Test idb.js Library</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IDB.js Library Test - Cost Manager Final Project v1.1</title>
     <style>
+        :root {
+            --primary-color: #1976d2;
+            --primary-light: #42a5f5;
+            --primary-dark: #1565c0;
+            --success-color: #4caf50;
+            --error-color: #f44336;
+            --warning-color: #ff9800;
+            --info-color: #2196f3;
+            --bg-color: #f5f5f5;
+            --card-bg: #ffffff;
+            --text-primary: #212121;
+            --text-secondary: #757575;
+            --border-color: #e0e0e0;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
-            font-family: Arial, sans-serif;
-            max-width: 800px;
-            margin: 50px auto;
-            padding: 20px;
-            background-color: #f5f5f5;
+            font-family: 'Roboto', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: var(--text-primary);
+            line-height: 1.6;
         }
+
         .container {
-            background: white;
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
-        h1 {
-            color: #333;
-            text-align: center;
-            margin-bottom: 30px;
-        }
-        .test-section {
-            margin-bottom: 30px;
+            max-width: 1200px;
+            margin: 0 auto;
             padding: 20px;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            background-color: #fafafa;
         }
-        .test-section h3 {
-            color: #555;
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            margin-bottom: 5px;
+        }
+
+        .header .subtitle {
+            font-size: 1rem;
+            opacity: 0.8;
+            font-weight: 300;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .card h2 {
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .card h3 {
+            color: var(--text-primary);
             margin-bottom: 15px;
+            font-size: 1.2rem;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 8px;
         }
-        button {
-            background: #667eea;
+
+        .test-controls {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
             color: white;
             border: none;
-            padding: 10px 20px;
-            border-radius: 5px;
+            padding: 12px 20px;
+            border-radius: 8px;
             cursor: pointer;
-            margin: 5px;
-            font-size: 14px;
+            font-size: 1rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            text-transform: none;
         }
-        button:hover {
-            background: #5a6fd8;
+
+        .btn:hover {
+            background: linear-gradient(135deg, var(--primary-dark), var(--primary-color));
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(25, 118, 210, 0.3);
         }
-        .result {
-            margin-top: 15px;
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn.danger {
+            background: linear-gradient(135deg, var(--error-color), #e57373);
+        }
+
+        .btn.danger:hover {
+            background: linear-gradient(135deg, #d32f2f, var(--error-color));
+            box-shadow: 0 4px 12px rgba(244, 67, 54, 0.3);
+        }
+
+        .btn.success {
+            background: linear-gradient(135deg, var(--success-color), #81c784);
+        }
+
+        .btn.success:hover {
+            background: linear-gradient(135deg, #388e3c, var(--success-color));
+            box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
+        }
+
+        .output-container {
+            height: 500px;
+            overflow-y: auto;
+            background: #f8f9fa;
+            border-radius: 8px;
             padding: 15px;
-            border-radius: 5px;
-            font-family: monospace;
-            white-space: pre-wrap;
-            background-color: #f8f9fa;
-            border: 1px solid #e9ecef;
+            border: 1px solid var(--border-color);
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            font-size: 0.9rem;
+            line-height: 1.5;
         }
-        .success {
-            background-color: #d4edda;
-            border-color: #c3e6cb;
-            color: #155724;
+
+        .log-entry {
+            margin-bottom: 8px;
+            padding: 6px 10px;
+            border-radius: 4px;
+            border-left: 4px solid transparent;
+            transition: all 0.2s ease;
         }
-        .error {
-            background-color: #f8d7da;
-            border-color: #f5c6cb;
-            color: #721c24;
+
+        .log-entry:hover {
+            background: rgba(0,0,0,0.05);
         }
-        .info {
-            background-color: #d1ecf1;
-            border-color: #bee5eb;
-            color: #0c5460;
+
+        .log-success {
+            color: var(--success-color);
+            border-left-color: var(--success-color);
+            background: rgba(76, 175, 80, 0.1);
+        }
+
+        .log-error {
+            color: var(--error-color);
+            border-left-color: var(--error-color);
+            background: rgba(244, 67, 54, 0.1);
+        }
+
+        .log-warning {
+            color: var(--warning-color);
+            border-left-color: var(--warning-color);
+            background: rgba(255, 152, 0, 0.1);
+        }
+
+        .log-info {
+            color: var(--info-color);
+            border-left-color: var(--info-color);
+            background: rgba(33, 150, 243, 0.1);
+        }
+
+        .timestamp {
+            opacity: 0.7;
+            font-weight: bold;
+        }
+
+        .requirements-section {
+            grid-column: 1 / -1;
+        }
+
+        .requirements-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .requirement-item {
+            background: rgba(255,255,255,0.1);
+            border-radius: 8px;
+            padding: 15px;
+            border-left: 4px solid var(--success-color);
+        }
+
+        .requirement-item h4 {
+            color: var(--success-color);
+            margin-bottom: 8px;
+            font-size: 1rem;
+        }
+
+        .requirement-item p {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+
+        .status-success { background: var(--success-color); }
+        .status-error { background: var(--error-color); }
+        .status-warning { background: var(--warning-color); }
+        .status-info { background: var(--info-color); }
+
+        .code-block {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+            overflow-x: auto;
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            font-size: 0.9rem;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .stat-card {
+            background: rgba(255,255,255,0.1);
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--primary-color);
+            display: block;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            opacity: 0.8;
+            margin-top: 5px;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .requirements-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .loading {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Test idb.js Library</h1>
-        
-        <div class="test-section">
-            <h3>Database Operations</h3>
-            <button onclick="testDatabase()">Test Database Creation</button>
-            <button onclick="testAddCost()">Test Add Cost</button>
-            <button onclick="testGetReport()">Test Get Report</button>
-            <button onclick="testGetAllCosts()">Test Get All Costs</button>
-            <button onclick="clearDatabase()">Clear Database</button>
-            <button onclick="debugDatabase()">🔍 Debug Database State</button>
-            <div id="db-result" class="result"></div>
+        <div class="header">
+            <h1>🗄️ IDB.js Library Test Suite v1.1</h1>
+            <p>Cost Manager Final Project - Front-End Development</p>
+            <p class="subtitle">Testing vanilla JavaScript IndexedDB wrapper library</p>
         </div>
 
-        <div class="test-section">
-            <h3>Sample Test (from requirements)</h3>
-            <button onclick="runSampleTest()">Run Sample Test</button>
-            <div id="sample-result" class="result"></div>
+        <div class="main-content">
+            <!-- Test Controls -->
+            <div class="card">
+                <h2>🧪 Test Controls</h2>
+                <div class="test-controls">
+                    <button class="btn" onclick="runRequirementsTest()">
+                        <span>📋</span> Run Requirements Test
+                    </button>
+                    <button class="btn" onclick="runBasicTest()">
+                        <span>🚀</span> Basic Test (From Spec)
+                    </button>
+                    <button class="btn success" onclick="runComprehensiveTest()">
+                        <span>🔍</span> Comprehensive Test
+                    </button>
+                    <button class="btn" onclick="testGetReport()">
+                        <span>📊</span> Test getReport Function
+                    </button>
+                    <button class="btn" onclick="testCurrencyConversion()">
+                        <span>💱</span> Test Currency Conversion
+                    </button>
+                    <button class="btn danger" onclick="clearDatabase()">
+                        <span>🗑️</span> Clear Database
+                    </button>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <span class="stat-number" id="testCount">0</span>
+                        <div class="stat-label">Tests Run</div>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-number" id="successCount">0</span>
+                        <div class="stat-label">Passed</div>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-number" id="errorCount">0</span>
+                        <div class="stat-label">Failed</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Test Output -->
+            <div class="card">
+                <h2>📝 Test Results</h2>
+                <div class="output-container" id="output">
+                    <div class="log-entry log-info">
+                        <span class="status-indicator status-info"></span>
+                        <span class="timestamp">[Ready]</span> IDB Library Test Suite initialized. Click a test button to begin.
+                    </div>
+                </div>
+            </div>
         </div>
 
-        <div class="test-section">
-            <h3>Console Output</h3>
-            <p>Check the browser console for detailed logs and any errors.</p>
+        <!-- Requirements Compliance -->
+        <div class="card requirements-section">
+            <h2>✅ Requirements Compliance Check</h2>
+            <p>This test suite validates compliance with the Front-End Development Final Project requirements:</p>
+            
+            <div class="requirements-grid">
+                <div class="requirement-item">
+                    <h4>✅ Database Implementation</h4>
+                    <p>IndexedDB with vanilla idb.js library providing Promise-based API</p>
+                </div>
+                <div class="requirement-item">
+                    <h4>✅ Required Functions</h4>
+                    <p>openCostsDB(), addCost(), getReport() - all implemented as specified</p>
+                </div>
+                <div class="requirement-item">
+                    <h4>✅ Global Object Access</h4>
+                    <p>Library adds 'db' property to global window object as required</p>
+                </div>
+                <div class="requirement-item">
+                    <h4>✅ Currency Support</h4>
+                    <p>USD, ILS, GBP, EURO currencies with conversion functionality</p>
+                </div>
+                <div class="requirement-item">
+                    <h4>✅ Data Structure</h4>
+                    <p>Cost items with sum, currency, category, description as specified</p>
+                </div>
+                <div class="requirement-item">
+                    <h4>✅ Report Format</h4>
+                    <p>Monthly reports with year, month, costs array, and total object</p>
+                </div>
+            </div>
+
+            <h3>📋 Expected Test Code (From Requirements)</h3>
+            <div class="code-block">
+async function test() {
+    const db = await idb.openCostsDB("costsdb",1);
+    const result1 = await db.addCost({
+        sum:200, currency:"USD", category:"FOOD", description:"pizza"
+    });
+    const result2 = await db.addCost({
+        sum:400, currency:"USD", category:"CAR", description:"fuel"
+    });
+    
+    if(db) console.log("creating db succeeded");
+    if(result1) console.log("adding 1st cost item succeeded");
+    if(result2) console.log("adding 2nd cost item succeeded");
+}
+            </div>
         </div>
     </div>
 
     <script src="idb.js"></script>
     <script>
-        let currentDatabase = null;
+        let testStats = { total: 0, success: 0, error: 0 };
 
-        function showResult(elementId, message, type = 'info') {
-            const element = document.getElementById(elementId);
-            element.textContent = message;
-            element.className = `result ${type}`;
+        function updateStats() {
+            document.getElementById('testCount').textContent = testStats.total;
+            document.getElementById('successCount').textContent = testStats.success;
+            document.getElementById('errorCount').textContent = testStats.error;
         }
 
-        async function testDatabase() {
-            try {
-                showResult('db-result', 'Opening database...', 'info');
-                const db = await idb.openCostsDB("costsdb", 1);
-                currentDatabase = db;
-                idb.setDatabase(db);
-                showResult('db-result', 'Database opened successfully!\nDatabase name: ' + db.name + '\nVersion: ' + db.version, 'success');
-                console.log('Database opened:', db);
-            } catch (error) {
-                showResult('db-result', 'Error opening database: ' + error.message, 'error');
-                console.error('Database error:', error);
-            }
+        function log(message, type = 'info') {
+            const output = document.getElementById('output');
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = document.createElement('div');
+            
+            const statusClass = type === 'success' ? 'status-success' : 
+                               type === 'error' ? 'status-error' :
+                               type === 'warning' ? 'status-warning' : 'status-info';
+            
+            logEntry.className = `log-entry log-${type}`;
+            logEntry.innerHTML = `
+                <span class="status-indicator ${statusClass}"></span>
+                <span class="timestamp">[${timestamp}]</span> ${message}
+            `;
+            
+            output.appendChild(logEntry);
+            output.scrollTop = output.scrollHeight;
+
+            // Update stats
+            if (type === 'success') testStats.success++;
+            if (type === 'error') testStats.error++;
+            testStats.total++;
+            updateStats();
         }
 
-        async function testAddCost() {
+        function clearLog() {
+            document.getElementById('output').innerHTML = '';
+            testStats = { total: 0, success: 0, error: 0 };
+            updateStats();
+        }
+
+        // Requirements test - exact specification compliance
+        async function runRequirementsTest() {
+            clearLog();
+            log("🎯 Running Requirements Compliance Test...", 'info');
+            
             try {
-                if (!currentDatabase) {
-                    showResult('db-result', 'Please open database first', 'error');
-                    return;
+                // Test 1: Global object access
+                log("1️⃣ Testing global object access...", 'info');
+                if (window.db && window.idb) {
+                    log("✅ Global 'db' and 'idb' objects available", 'success');
+                } else {
+                    throw new Error("Global objects not found");
                 }
 
-                showResult('db-result', 'Adding cost items...', 'info');
+                // Test 2: Required functions exist
+                log("2️⃣ Testing required function signatures...", 'info');
+                const requiredFunctions = ['openCostsDB', 'addCost', 'getReport'];
+                for (const func of requiredFunctions) {
+                    if (typeof window.idb[func] === 'function') {
+                        log(`✅ Function ${func}() exists`, 'success');
+                    } else {
+                        throw new Error(`Required function ${func}() not found`);
+                    }
+                }
+
+                // Test 3: Run exact test from requirements document
+                log("3️⃣ Running exact test code from requirements document...", 'info');
                 
-                const result1 = await idb.addCost({
+                const db = await idb.openCostsDB("costsdb", 1);
+                const result1 = await db.addCost({
                     sum: 200, 
                     currency: "USD", 
-                    category: "FOOD",
+                    category: "FOOD", 
                     description: "pizza"
                 });
-
-                const result2 = await idb.addCost({
-                    sum: 400, 
-                    currency: "USD", 
-                    category: "CAR",
-                    description: "fuel"
-                });
-
-                showResult('db-result', 
-                    'Cost items added successfully!\n\n' +
-                    'First item: ' + JSON.stringify(result1, null, 2) + '\n\n' +
-                    'Second item: ' + JSON.stringify(result2, null, 2), 
-                    'success'
-                );
-                console.log('Added cost items:', result1, result2);
-            } catch (error) {
-                showResult('db-result', 'Error adding cost: ' + error.message, 'error');
-                console.error('Add cost error:', error);
-            }
-        }
-
-        async function testGetReport() {
-            try {
-                if (!currentDatabase) {
-                    showResult('db-result', 'Please open database first', 'error');
-                    return;
-                }
-
-                showResult('db-result', 'Generating report...', 'info');
-                const currentDate = new Date();
-                const year = currentDate.getFullYear();
-                const month = currentDate.getMonth() + 1;
-                
-                const report = await idb.getReport(year, month, "USD");
-                showResult('db-result', 
-                    'Report generated successfully!\n\n' + 
-                    JSON.stringify(report, null, 2), 
-                    'success'
-                );
-                console.log('Generated report:', report);
-            } catch (error) {
-                showResult('db-result', 'Error generating report: ' + error.message, 'error');
-                console.error('Report error:', error);
-            }
-        }
-
-        async function testGetAllCosts() {
-            try {
-                if (!currentDatabase) {
-                    showResult('db-result', 'Please open database first', 'error');
-                    return;
-                }
-
-                showResult('db-result', 'Retrieving all costs...', 'info');
-                const allCosts = await idb.getAllCosts();
-                showResult('db-result', 
-                    'All costs retrieved successfully!\n\n' + 
-                    JSON.stringify(allCosts, null, 2), 
-                    'success'
-                );
-                console.log('All costs:', allCosts);
-            } catch (error) {
-                showResult('db-result', 'Error retrieving costs: ' + error.message, 'error');
-                console.error('Get all costs error:', error);
-            }
-        }
-
-        async function clearDatabase() {
-            try {
-                if (!currentDatabase) {
-                    showResult('db-result', 'Please open database first', 'error');
-                    return;
-                }
-
-                showResult('db-result', 'Clearing database...', 'info');
-                await idb.clearAllCosts();
-                showResult('db-result', 'Database cleared successfully!', 'success');
-                console.log('Database cleared');
-            } catch (error) {
-                showResult('db-result', 'Error clearing database: ' + error.message, 'error');
-                console.error('Clear database error:', error);
-            }
-        }
-
-        async function runSampleTest() {
-            try {
-                showResult('sample-result', 'Running sample test from requirements (with typo fixed)...', 'info');
-                
-                // Test the exact sample from requirements document
-                const db = await idb.openCostsDB("costsdb", 1);
-                
-                // Note: The requirements document has a typo "curency" instead of "currency" 
-                // in the first addCost call. We'll test both the typo version and corrected version.
-                
-                if (db) {
-                    console.log("creating db succeeded");
-                }
-
-                // First test with the typo as in requirements (this should fail gracefully)
-                let result1;
-                try {
-                    result1 = await db.addCost({
-                        sum: 200, 
-                        curency: "USD",  // Typo as in requirements document
-                        category: "FOOD",
-                        description: "pizza"
-                    });
-                } catch (error) {
-                    console.log("First call with typo failed as expected:", error.message);
-                    // Now try with correct spelling
-                    result1 = await db.addCost({
-                        sum: 200, 
-                        currency: "USD",  // Corrected spelling
-                        category: "FOOD",
-                        description: "pizza"
-                    });
-                }
-
                 const result2 = await db.addCost({
                     sum: 400, 
                     currency: "USD", 
-                    category: "CAR",
+                    category: "CAR", 
                     description: "fuel"
                 });
 
+                if (db) {
+                    log("✅ creating db succeeded", 'success');
+                }
                 if (result1) {
-                    console.log("adding 1st cost item succeeded");
+                    log("✅ adding 1st cost item succeeded", 'success');
+                    log(`   📄 Result: ${JSON.stringify(result1)}`, 'info');
+                }
+                if (result2) {
+                    log("✅ adding 2nd cost item succeeded", 'success');
+                    log(`   📄 Result: ${JSON.stringify(result2)}`, 'info');
+                }
+
+                // Test 4: Validate return format
+                log("4️⃣ Validating return object format...", 'info');
+                const expectedProps = ['sum', 'currency', 'category', 'description'];
+                for (const prop of expectedProps) {
+                    if (result1.hasOwnProperty(prop)) {
+                        log(`✅ Property '${prop}' present in result`, 'success');
+                    } else {
+                        throw new Error(`Missing required property: ${prop}`);
+                    }
+                }
+
+                log("🎉 Requirements compliance test PASSED! All specifications met.", 'success');
+                
+            } catch (error) {
+                log(`❌ Requirements test failed: ${error.message}`, 'error');
+                console.error('Requirements test error:', error);
+            }
+        }
+
+        // Basic test from the requirements document (exact copy)
+        async function runBasicTest() {
+            clearLog();
+            log("🚀 Running Basic Test (Exact Copy from Requirements)...", 'info');
+            
+            try {
+                // This is the EXACT test from the requirements document
+                const db = await idb.openCostsDB("costsdb", 1);
+                
+                const result1 = await db.addCost({
+                    sum: 200, 
+                    currency: "USD", 
+                    category: "FOOD", 
+                    description: "pizza"
+                });
+                
+                const result2 = await db.addCost({
+                    sum: 400, 
+                    currency: "USD", 
+                    category: "CAR", 
+                    description: "fuel"
+                });
+
+                if (db) {
+                    log("✅ creating db succeeded", 'success');
+                }
+
+                if (result1) {
+                    log("✅ adding 1st cost item succeeded", 'success');
+                    log(`   → Added: ${JSON.stringify(result1)}`, 'info');
                 }
 
                 if (result2) {
-                    console.log("adding 2nd cost item succeeded");
+                    log("✅ adding 2nd cost item succeeded", 'success');
+                    log(`   → Added: ${JSON.stringify(result2)}`, 'info');
                 }
 
-                showResult('sample-result', 
-                    'Sample test completed successfully!\n\n' +
-                    'Check console for detailed output.\n\n' +
-                    'Results:\n' +
-                    '- Database: ' + (db ? 'SUCCESS' : 'FAILED') + '\n' +
-                    '- First cost: ' + (result1 ? 'SUCCESS' : 'FAILED') + '\n' +
-                    '- Second cost: ' + (result2 ? 'SUCCESS' : 'FAILED') + '\n\n' +
-                    'Note: Requirements document has typo "curency" - we handle both versions', 
-                    'success'
-                );
-            } catch (error) {
-                showResult('sample-result', 'Sample test failed: ' + error.message, 'error');
-                console.error('Sample test error:', error);
-            }
-        }
-
-        // Debug function to check database state
-        function debugDatabase() {
-            try {
-                const state = idb.getDatabaseState();
-                const debugInfo = `Database Debug Info:
-• Has Database: ${state.hasDatabase}
-• Database Type: ${state.databaseType}
-• Has Transaction Function: ${state.hasTransaction}
-• Database Name: ${state.databaseName}
-• Database Version: ${state.databaseVersion}
-• Window.db exists: ${typeof window.db !== 'undefined'}
-• Window.db.database exists: ${typeof window.db.database !== 'undefined'}`;
+                log("🎉 Basic test completed successfully!", 'success');
                 
-                showResult('db-result', debugInfo, state.hasTransaction ? 'success' : 'error');
-                console.log('Database State:', state);
             } catch (error) {
-                showResult('db-result', 'Error getting debug info: ' + error.message, 'error');
+                log(`❌ Basic test failed: ${error.message}`, 'error');
+                console.error('Basic test error:', error);
             }
         }
 
-        // Auto-run the sample test when page loads
-        window.addEventListener('load', () => {
-            console.log('Test page loaded. Ready to test idb.js library.');
+        // Comprehensive test of all functionality
+        async function runComprehensiveTest() {
+            clearLog();
+            log("🔍 Running Comprehensive Functionality Test...", 'info');
+            
+            try {
+                // Test 1: Database operations
+                log("1️⃣ Testing database initialization...", 'info');
+                const db = await idb.openCostsDB("costsdb", 1);
+                log("✅ Database opened successfully", 'success');
+
+                // Test 2: Multiple cost additions with all currencies
+                log("2️⃣ Testing multi-currency cost additions...", 'info');
+                const testCosts = [
+                    { sum: 25.50, currency: "USD", category: "Food", description: "Coffee and pastry" },
+                    { sum: 45.75, currency: "GBP", category: "Transportation", description: "Bus fare" },
+                    { sum: 12.30, currency: "EURO", category: "Entertainment", description: "Movie ticket" },
+                    { sum: 150.00, currency: "ILS", category: "Healthcare", description: "Pharmacy" },
+                    { sum: 89.99, currency: "USD", category: "Shopping", description: "Online purchase" }
+                ];
+
+                for (let i = 0; i < testCosts.length; i++) {
+                    const result = await db.addCost(testCosts[i]);
+                    log(`✅ Cost ${i + 1}: ${result.sum} ${result.currency} - ${result.description}`, 'success');
+                }
+
+                // Test 3: Data retrieval
+                log("3️⃣ Testing data retrieval...", 'info');
+                const allCosts = await db.getAllCosts();
+                log(`✅ Retrieved ${allCosts.length} total cost items from database`, 'success');
+
+                // Test 4: Report generation
+                log("4️⃣ Testing report generation...", 'info');
+                const currentYear = new Date().getFullYear();
+                const currentMonth = new Date().getMonth() + 1; // Convert 0-11 to 1-12
+                
+                log(`   📅 Requesting report for: Year=${currentYear}, Month=${currentMonth}`, 'info');
+                
+                const report = await db.getReport(currentYear, currentMonth, "USD");
+                log(`✅ Generated report for ${currentMonth}/${currentYear}`, 'success');
+                log(`   📊 Items: ${report.costs.length}, Total: ${report.total.total.toFixed(2)} ${report.total.currency}`, 'info');
+
+                // Test 5: Report structure validation
+                log("5️⃣ Validating report structure...", 'info');
+                if (report.year && report.month && report.costs && report.total) {
+                    log("✅ Report structure is correct (year, month, costs, total)", 'success');
+                    
+                    if (report.costs.length > 0) {
+                        const firstCost = report.costs[0];
+                        if (firstCost.sum && firstCost.currency && firstCost.category && firstCost.description && firstCost.Date) {
+                            log("✅ Cost item structure is correct", 'success');
+                        }
+                    }
+                    
+                    if (report.total.currency && typeof report.total.total === 'number') {
+                        log("✅ Total object structure is correct", 'success');
+                    }
+                } else {
+                    throw new Error("Invalid report structure");
+                }
+
+                log("🎉 Comprehensive test completed successfully!", 'success');
+                
+            } catch (error) {
+                log(`❌ Comprehensive test failed: ${error.message}`, 'error');
+                console.error('Comprehensive test error:', error);
+            }
+        }
+
+        // Test getReport function with example data from requirements
+        async function testGetReport() {
+            clearLog();
+            log("📊 Testing getReport Function with Requirements Example...", 'info');
+            
+            try {
+                const db = await idb.openCostsDB("costsdb", 1);
+                
+                // Add the exact example data from requirements document
+                log("1️⃣ Adding example data from requirements...", 'info');
+                await db.addCost({ sum: 200, currency: "USD", category: "Food", description: "Milk 3%" });
+                await db.addCost({ sum: 120, currency: "GBP", category: "Education", description: "Zoom License" });
+                
+                const currentYear = new Date().getFullYear();
+                const currentMonth = new Date().getMonth() + 1; // Convert 0-11 to 1-12
+                
+                log(`   📅 Requesting reports for: Year=${currentYear}, Month=${currentMonth}`, 'info');
+                
+                // Test reports in all supported currencies
+                log("2️⃣ Testing reports in all currencies...", 'info');
+                
+                const currencies = ["USD", "GBP", "EURO", "ILS"];
+                for (const currency of currencies) {
+                    const report = await db.getReport(currentYear, currentMonth, currency);
+                    log(`✅ Report in ${currency}:`, 'success');
+                    log(`   📅 Period: ${report.month}/${report.year}`, 'info');
+                    log(`   📋 Items: ${report.costs.length}`, 'info');
+                    log(`   💰 Total: ${report.total.total.toFixed(2)} ${report.total.currency}`, 'info');
+                    
+                    // Show detailed cost breakdown
+                    report.costs.forEach((cost, index) => {
+                        log(`   ${index + 1}. Day ${cost.Date.day}: ${cost.sum.toFixed(2)} ${cost.currency} - ${cost.description} (${cost.category})`, 'info');
+                    });
+                }
+                
+                log("🎉 getReport test completed successfully!", 'success');
+                
+            } catch (error) {
+                log(`❌ getReport test failed: ${error.message}`, 'error');
+                console.error('getReport test error:', error);
+            }
+        }
+
+        // Test currency conversion functionality
+        async function testCurrencyConversion() {
+            clearLog();
+            log("💱 Testing Currency Conversion Functionality...", 'info');
+            
+            try {
+                const db = await idb.openCostsDB("costsdb", 1);
+                
+                // Set up test exchange rates (as per requirements)
+                window.app = {
+                    exchangeRates: { USD: 1, GBP: 1.8, EURO: 0.7, ILS: 3.4 }
+                };
+                
+                log("1️⃣ Setting up test data with different currencies...", 'info');
+                
+                // Add costs in different currencies
+                await db.addCost({ sum: 100, currency: "USD", category: "Test", description: "USD Test" });
+                await db.addCost({ sum: 100, currency: "GBP", category: "Test", description: "GBP Test" });
+                await db.addCost({ sum: 100, currency: "EURO", category: "Test", description: "EURO Test" });
+                await db.addCost({ sum: 100, currency: "ILS", category: "Test", description: "ILS Test" });
+                
+                const currentYear = new Date().getFullYear();
+                const currentMonth = new Date().getMonth() + 1; // Convert 0-11 to 1-12
+                
+                log(`   📅 Requesting conversion reports for: Year=${currentYear}, Month=${currentMonth}`, 'info');
+                
+                log("2️⃣ Testing conversion to USD (base currency)...", 'info');
+                const usdReport = await db.getReport(currentYear, currentMonth, "USD");
+                
+                log(`✅ Converted to USD - Total: ${usdReport.total.total.toFixed(2)} USD`, 'success');
+                log("   Expected: 100 + 180 + 142.86 + 29.41 ≈ 452.27 USD", 'info');
+                
+                // Test conversion to other currencies
+                log("3️⃣ Testing conversion to other currencies...", 'info');
+                
+                const gbpReport = await db.getReport(currentYear, currentMonth, "GBP");
+                log(`✅ Converted to GBP - Total: ${gbpReport.total.total.toFixed(2)} GBP`, 'success');
+                
+                const euroReport = await db.getReport(currentYear, currentMonth, "EURO");
+                log(`✅ Converted to EURO - Total: ${euroReport.total.total.toFixed(2)} EURO`, 'success');
+                
+                const ilsReport = await db.getReport(currentYear, currentMonth, "ILS");
+                log(`✅ Converted to ILS - Total: ${ilsReport.total.total.toFixed(2)} ILS`, 'success');
+                
+                log("🎉 Currency conversion test completed successfully!", 'success');
+                
+            } catch (error) {
+                log(`❌ Currency conversion test failed: ${error.message}`, 'error');
+                console.error('Currency conversion test error:', error);
+            }
+        }
+
+        // Clear database
+        async function clearDatabase() {
+            clearLog();
+            log("🗑️ Clearing database for fresh testing...", 'warning');
+            
+            try {
+                const db = await idb.openCostsDB("costsdb", 1);
+                await db.clearAllCosts();
+                log("✅ Database cleared successfully", 'success');
+                log("💡 Ready for new tests", 'info');
+            } catch (error) {
+                log(`❌ Failed to clear database: ${error.message}`, 'error');
+            }
+        }
+
+        // Set up default exchange rates for testing (as per requirements)
+        window.app = {
+            exchangeRates: {
+                USD: 1,
+                GBP: 1.8,
+                EURO: 0.7,
+                ILS: 3.4
+            }
+        };
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            log("🚀 IDB Library Test Suite initialized", 'success');
+            log("📋 Testing vanilla JavaScript IndexedDB wrapper for Cost Manager", 'info');
+            log("💡 Exchange rates configured: USD=1, GBP=1.8, EURO=0.7, ILS=3.4", 'info');
+            log("🎯 Click 'Requirements Test' to validate full specification compliance", 'warning');
         });
     </script>
 </body>

@@ -1,51 +1,52 @@
-# Cost Manager - React & MUI Final Project
+# 💰 Cost Manager - Student Project
 
-A cost management web application built with **React** and **Material-UI** for the Front-End Development Final Project.
+A simple expense tracker built with **React + Material-UI** and **IndexedDB** - perfect for students learning modern web development!
 
 ## Features
 
-✅ **All Requirements Met:**
+✅ **Core Functionality:**
 - Add cost items (amount, currency, category, description)
 - Monthly reports with currency conversion
 - Pie charts (category breakdown)
-- Bar charts (12-month view)
+- Bar charts (monthly totals)
 - Multi-currency support (USD, ILS, GBP, EURO)
 - Exchange rate API configuration
 - IndexedDB local storage
 
 ## Technology Stack
 
-- **React 18** - UI framework
-- **Material-UI v5** - Component library
-- **IndexedDB** - Local database
+- **React 18** - Modern JavaScript framework
+- **Material-UI (MUI)** - Beautiful React components
+- **Create React App** - Easy project setup
+- **IndexedDB** - Browser database storage
 - **Chart.js** - Charts and visualization
 
-## Setup
+## Quick Start
 
-1. Install dependencies:
+1. Install all the packages we need:
    ```bash
    npm install
    ```
 
-2. Start development server:
+2. Start the React app:
    ```bash
    npm start
    ```
 
-3. Open [http://localhost:3000](http://localhost:3000)
+3. Open [http://localhost:3001](http://localhost:3001) in your browser
 
 ## Project Structure
 
 ```
 src/
-├── App.js                 # Main application
-├── components/            # React components
-│   ├── AddCostTab.js      # Add expenses
-│   ├── ReportsTab.js      # Monthly reports
-│   ├── ChartsTab.js       # Data visualization
-│   └── SettingsTab.js     # Configuration
+├── main.js                # Application entry point
+├── styles.css             # Clean, modern styling
 └── services/
-    └── idb.js             # IndexedDB operations
+    ├── idb.js             # IndexedDB operations
+    ├── currency.js        # Currency conversion
+    └── charts.js          # Chart.js wrapper
+public/
+└── sample-rates.json      # Sample exchange rates
 ```
 
 ## Database
@@ -59,20 +60,29 @@ Uses IndexedDB with:
 
 Open `test-idb.html` in browser to test the vanilla idb.js library.
 
-## Requirements Compliance
+## Student-Friendly Features
 
-This project fully implements all specifications from the Front-End Development Final Project requirements:
+This implementation focuses on **clarity and learning**:
 
-1. ✅ React + MUI implementation
-2. ✅ IndexedDB with idb.js library (React + vanilla versions)
-3. ✅ Add cost functionality
-4. ✅ Monthly reports with currency conversion
-5. ✅ Pie charts by category
-6. ✅ Bar charts by month
-7. ✅ Multi-currency support (USD, ILS, GBP, EURO)
-8. ✅ Exchange rate API integration
-9. ✅ Settings configuration
+1. ✅ **Pure JavaScript** - No complex frameworks to learn
+2. ✅ **Modular code** - Clear separation of concerns
+3. ✅ **Extensive comments** - Every function explained
+4. ✅ **Error handling** - Proper try/catch blocks
+5. ✅ **Console logging** - Easy debugging
+6. ✅ **Simple HTML/CSS** - Clean, readable structure
+7. ✅ **Modern ES6+** - Current JavaScript best practices
 
-## License
+## Exchange Rates
 
-MIT - Educational project for Front-End Development course.
+Configure a JSON endpoint with this format:
+```json
+{
+  "USD": 1,
+  "GBP": 1.8,
+  "EURO": 0.7,
+  "ILS": 3.4
+}
+```
+
+Example: `http://localhost:5173/sample-rates.json`
+

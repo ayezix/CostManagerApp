@@ -1,3 +1,7 @@
+// App.js - Simple Student Version
+// This is the main file for our Cost Manager app
+// It creates the tabs and handles the database connection
+
 import React, { useState, useEffect } from 'react';
 import {
   ThemeProvider,
@@ -20,70 +24,25 @@ import {
   Settings as SettingsIcon
 } from '@mui/icons-material';
 
+// Import our tab components
 import AddCostTab from './components/AddCostTab';
 import ReportsTab from './components/ReportsTab';
 import ChartsTab from './components/ChartsTab';
 import SettingsTab from './components/SettingsTab';
-import * as idb from './services/idb';
 
+// Create a simple blue theme for our app
 const theme = createTheme({
   palette: {
     primary: { 
-      main: '#1976d2',
-      light: '#42a5f5',
-      dark: '#1565c0'
+      main: '#1976d2' // Blue color
     },
     secondary: { 
-      main: '#dc004e',
-      light: '#ff5983',
-      dark: '#9a0036'
-    },
-    background: {
-      default: '#f5f5f5',
-      paper: '#ffffff'
-    }
-  },
-  typography: {
-    fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
-    h4: {
-      fontWeight: 600,
-      color: '#1565c0'
-    },
-    h6: {
-      fontWeight: 500
-    }
-  },
-  components: {
-    MuiPaper: {
-      styleOverrides: {
-        root: {
-          boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
-          borderRadius: 12
-        }
-      }
-    },
-    MuiButton: {
-      styleOverrides: {
-        root: {
-          borderRadius: 8,
-          textTransform: 'none',
-          fontWeight: 600
-        }
-      }
-    },
-    MuiTab: {
-      styleOverrides: {
-        root: {
-          textTransform: 'none',
-          fontSize: '1rem',
-          fontWeight: 500,
-          minHeight: 64
-        }
-      }
+      main: '#dc004e' // Pink color
     }
   }
 });
 
+// Simple component to show the right tab content
 function TabPanel({ children, value, index }) {
   return (
     <div role="tabpanel" hidden={value !== index}>
@@ -93,29 +52,58 @@ function TabPanel({ children, value, index }) {
 }
 
 function App() {
-  const [tabValue, setTabValue] = useState(0);
+  // State for currently active tab (0=Add Cost, 1=Reports, 2=Charts, 3=Settings)
+  const [activeTab, setActiveTab] = useState(0);
+  
+  // State for database connection
   const [database, setDatabase] = useState(null);
-  const [exchangeRates, setExchangeRates] = useState({ USD: 1, GBP: 1.8, EURO: 0.7, ILS: 3.4 });
+  
+  // State for exchange rates (default rates as per requirements)
+  const [exchangeRates, setExchangeRates] = useState({
+    USD: 1,
+    GBP: 1.8,
+    EURO: 0.7,
+    ILS: 3.4
+  });
+  
+  // State for exchange rate URL setting
   const [exchangeRateUrl, setExchangeRateUrl] = useState('');
-  const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'info' });
+  
+  // State for showing messages to user
+  const [snackbar, setSnackbar] = useState({
+    open: false,
+    message: '',
+    severity: 'info'
+  });
 
+  // Set up the database when the app starts
+  useEffect(() => {
+    async function initializeDatabase() {
+      try {
+        // Check if our idb.js library is loaded
+        if (window.idb) {
+          // Open the database (like opening a file)
+          const db = await window.idb.openCostsDB('costsdb', 1);
+          setDatabase(db);
+          console.log('✅ Database is ready!');
+        } else {
+          throw new Error('idb.js library not loaded');
+        }
+      } catch (error) {
+        console.error('❌ Database failed to start:', error);
+        showMessage('Database error: ' + error.message, 'error');
+      }
+    }
+    
+    initializeDatabase();
+  }, []); // This runs once when the app starts
+
+  // Share exchange rates with the idb.js library
   useEffect(() => {
     window.app = { exchangeRates };
   }, [exchangeRates]);
 
-  useEffect(() => {
-    const initDB = async () => {
-      try {
-        const db = await idb.openCostsDB('costsdb', 1);
-        idb.setDatabase(db);
-        setDatabase(db);
-      } catch (error) {
-        showMessage('Database error: ' + error.message, 'error');
-      }
-    };
-    initDB();
-  }, []);
-
+  // Load saved URL from browser storage when app starts
   useEffect(() => {
     const savedUrl = localStorage.getItem('exchangeRateUrl');
     if (savedUrl) {
@@ -124,57 +112,82 @@ function App() {
     }
   }, []);
 
-  const handleTabChange = (event, newValue) => setTabValue(newValue);
-  const showMessage = (message, severity = 'info') => setSnackbar({ open: true, message, severity });
-  const handleSnackbarClose = (event, reason) => {
+  // Function to change active tab
+  function handleTabChange(event, newTabValue) {
+    setActiveTab(newTabValue);
+  }
+
+  // Function to show messages to user
+  function showMessage(message, severity = 'info') {
+    setSnackbar({
+      open: true,
+      message: message,
+      severity: severity
+    });
+  }
+
+  // Function to hide message
+  function handleSnackbarClose(event, reason) {
     if (reason === 'clickaway') return;
     setSnackbar({ ...snackbar, open: false });
-  };
+  }
 
-  const fetchExchangeRates = async (url) => {
+  // Function to get exchange rates from a URL
+  async function fetchExchangeRates(url) {
     if (!url) return;
+    
     try {
+      // Get data from the URL using fetch (as required by project)
       const response = await fetch(url);
-      if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      // Convert the response to JavaScript object
       const rates = await response.json();
       setExchangeRates(rates);
       showMessage('Exchange rates updated!', 'success');
+      
     } catch (error) {
-      showMessage('Failed to fetch rates: ' + error.message, 'error');
+      showMessage('Failed to get rates: ' + error.message, 'error');
     }
-  };
+  }
 
-  const saveSettings = (url) => {
+  // Function to save the exchange rate URL
+  function saveSettings(url) {
+    // Save to browser storage so we remember it next time
+    localStorage.setItem('exchangeRateUrl', url);
+    setExchangeRateUrl(url);
+    
+    // Get new rates if user provided a URL
     if (url) {
-      localStorage.setItem('exchangeRateUrl', url);
-      setExchangeRateUrl(url);
-      showMessage('Settings saved!', 'success');
       fetchExchangeRates(url);
-    } else {
-      showMessage('Invalid URL', 'error');
     }
-  };
+    
+    showMessage('Settings saved!', 'success');
+  }
 
+  // Render the main application
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <Box sx={{ minHeight: '100vh', bgcolor: 'background.default' }}>
-        <AppBar position="static" elevation={0} sx={{ bgcolor: 'primary.main' }}>
+      <Container maxWidth={false} disableGutters>
+        
+        {/* Top Navigation Bar */}
+        <AppBar position="static" elevation={0}>
           <Container maxWidth="lg">
-            <Toolbar sx={{ py: 1 }}>
-              <WalletIcon sx={{ mr: 2, fontSize: 32 }} />
-              <Box sx={{ flexGrow: 1 }}>
-                <Typography variant="h6" sx={{ fontWeight: 600, color: 'white' }}>
-                  Cost Manager
-                </Typography>
-                <Typography variant="caption" sx={{ opacity: 0.9, color: 'white' }}>
-                  Track expenses with React & Material-UI
-                </Typography>
-              </Box>
+            <Toolbar>
+              <Typography variant="h4" component="div" sx={{ flexGrow: 1 }}>
+                💰 Cost Manager
+              </Typography>
+              <Typography variant="body2" sx={{ opacity: 0.9 }}>
+                React + MUI + IndexedDB Implementation
+              </Typography>
             </Toolbar>
           </Container>
         </AppBar>
 
+        {/* Main Content Area */}
         <Container maxWidth="lg" sx={{ py: 4 }}>
           <Box sx={{ 
             bgcolor: 'background.paper', 
@@ -182,8 +195,10 @@ function App() {
             overflow: 'hidden',
             boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)'
           }}>
+            
+            {/* Tab Navigation */}
             <Tabs 
-              value={tabValue} 
+              value={activeTab} 
               onChange={handleTabChange} 
               variant="fullWidth"
               sx={{ 
@@ -214,17 +229,26 @@ function App() {
               />
             </Tabs>
 
+            {/* Tab Content */}
             <Box sx={{ p: 3, minHeight: 400 }}>
-              <TabPanel value={tabValue} index={0}>
-                <AddCostTab showMessage={showMessage} idb={idb} />
+              
+              {/* Add Cost Tab */}
+              <TabPanel value={activeTab} index={0}>
+                <AddCostTab showMessage={showMessage} database={database} />
               </TabPanel>
-              <TabPanel value={tabValue} index={1}>
-                <ReportsTab showMessage={showMessage} idb={idb} />
+              
+              {/* Reports Tab */}
+              <TabPanel value={activeTab} index={1}>
+                <ReportsTab showMessage={showMessage} database={database} />
               </TabPanel>
-              <TabPanel value={tabValue} index={2}>
-                <ChartsTab showMessage={showMessage} idb={idb} />
+              
+              {/* Charts Tab */}
+              <TabPanel value={activeTab} index={2}>
+                <ChartsTab showMessage={showMessage} database={database} />
               </TabPanel>
-              <TabPanel value={tabValue} index={3}>
+              
+              {/* Settings Tab */}
+              <TabPanel value={activeTab} index={3}>
                 <SettingsTab 
                   showMessage={showMessage}
                   exchangeRateUrl={exchangeRateUrl}
@@ -236,11 +260,12 @@ function App() {
           </Box>
         </Container>
 
+        {/* Message Display (Snackbar) */}
         <Snackbar
           open={snackbar.open}
-          autoHideDuration={5000}
+          autoHideDuration={6000}
           onClose={handleSnackbarClose}
-          anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+          anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
         >
           <Alert 
             onClose={handleSnackbarClose} 
@@ -251,7 +276,7 @@ function App() {
             {snackbar.message}
           </Alert>
         </Snackbar>
-      </Box>
+      </Container>
     </ThemeProvider>
   );
 }

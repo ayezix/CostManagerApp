@@ -1,6 +1,6 @@
 {
   "short_name": "Cost Manager",
-  "name": "Cost Manager - React MUI Final Project",
+  "name": "Cost Manager - Final Project",
   "icons": [
     {
       "src": "favicon.ico",
@@ -10,6 +10,6 @@
   ],
   "start_url": ".",
   "display": "standalone",
-  "theme_color": "#64b5f6",
+  "theme_color": "#000000",
   "background_color": "#ffffff"
 }
