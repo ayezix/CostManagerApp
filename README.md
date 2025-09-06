@@ -39,14 +39,19 @@ A simple expense tracker built with **React + Material-UI** and **IndexedDB** - 
 
 ```
 src/
-├── main.js                # Application entry point
-├── styles.css             # Clean, modern styling
-└── services/
-    ├── idb.js             # IndexedDB operations
-    ├── currency.js        # Currency conversion
-    └── charts.js          # Chart.js wrapper
+├── App.js                 # Main React component with tabs
+├── index.js               # React entry point
+├── reportWebVitals.js     # Performance monitoring
+└── components/
+    ├── AddCostTab.js      # Add expense form
+    ├── ReportsTab.js      # Monthly reports
+    ├── ChartsTab.js       # Pie and bar charts
+    └── SettingsTab.js     # Settings configuration
 public/
+├── idb.js                 # React-compatible IndexedDB library
 └── sample-rates.json      # Sample exchange rates
+idb.js                     # Vanilla IndexedDB library (for submission)
+test-idb.html             # Comprehensive testing suite
 ```
 
 ## Database
@@ -64,13 +69,17 @@ Open `test-idb.html` in browser to test the vanilla idb.js library.
 
 This implementation focuses on **clarity and learning**:
 
-1. ✅ **Pure JavaScript** - No complex frameworks to learn
-2. ✅ **Modular code** - Clear separation of concerns
-3. ✅ **Extensive comments** - Every function explained
-4. ✅ **Error handling** - Proper try/catch blocks
-5. ✅ **Console logging** - Easy debugging
-6. ✅ **Simple HTML/CSS** - Clean, readable structure
-7. ✅ **Modern ES6+** - Current JavaScript best practices
+1. ✅ **React + MUI implementation** - Modern, professional UI framework
+2. ✅ **IndexedDB with idb.js library** - Both React + vanilla versions
+3. ✅ **Add cost functionality** - Complete form with validation
+4. ✅ **Monthly reports** - With currency conversion
+5. ✅ **Pie charts by category** - Visual expense breakdown
+6. ✅ **Bar charts by month** - 12-month overview
+7. ✅ **Multi-currency support** - USD, ILS, GBP, EURO
+8. ✅ **Exchange rate API integration** - Configurable URL
+9. ✅ **Settings configuration** - Easy customization
+10. ✅ **Extensive comments** - Every function explained
+11. ✅ **Student-friendly code** - Clear, simple patterns
 
 ## Exchange Rates
 
@@ -84,5 +93,4 @@ Configure a JSON endpoint with this format:
 }
 ```
 
-Example: `http://localhost:5173/sample-rates.json`
-
+Example: `http://localhost:3001/sample-rates.json`
