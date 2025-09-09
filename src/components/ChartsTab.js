@@ -1,7 +1,6 @@
-// ChartsTab.js - Simple Student Version
-// This creates the charts page with pie charts and bar charts
+// ChartsTab.js - Charts page with pie and bar charts
 
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
   Paper,
   Typography,
@@ -14,12 +13,9 @@ import {
 import { BarChart as BarChartIcon, PieChart as PieChartIcon } from '@mui/icons-material';
 import { Chart as ChartJS, ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement, Title } from 'chart.js';
 import { Pie, Bar } from 'react-chartjs-2';
+import { CURRENCIES } from '../services/currencyService';
 
-// Tell Chart.js what components we want to use
 ChartJS.register(ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement, Title);
-
-// The 4 currencies we support
-const CURRENCIES = ['USD', 'ILS', 'GBP', 'EURO'];
 
 // All 12 months with their numbers (1-12)
 const MONTHS = [
@@ -38,24 +34,24 @@ const MONTHS = [
 ];
 
 function ChartsTab({ showMessage, database }) {
-  // What the user wants to see in the pie chart (month, year, currency)
+  // Pie chart settings
   const [pieFilters, setPieFilters] = useState({
-    year: new Date().getFullYear(),        // Current year
-    month: new Date().getMonth() + 1,      // Current month  
-    currency: 'USD'                        // Default to US Dollars
+    year: new Date().getFullYear(),
+    month: new Date().getMonth() + 1,
+    currency: 'USD'
   });
   
-  // What the user wants to see in the bar chart (year, currency)
+  // Bar chart settings
   const [barFilters, setBarFilters] = useState({
-    year: new Date().getFullYear(),        // Current year
-    currency: 'USD'                        // Default to US Dollars
+    year: new Date().getFullYear(),
+    currency: 'USD'
   });
   
-  // The chart data we'll show to the user
+  // Chart data
   const [pieData, setPieData] = useState(null);
   const [barData, setBarData] = useState(null);
   
-  // Whether we're currently loading data
+  // Loading states
   const [loading, setLoading] = useState({ pie: false, bar: false });
 
   // Function to update pie chart filters when user changes dropdowns

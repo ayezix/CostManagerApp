@@ -3,24 +3,25 @@
  * This file creates a database library for the Cost Manager project
  * 
  * What this does:
- * - Creates window.db and window.idb objects for the browser
+ * - Creates window.idb and window.idb objects for the browser
  * - Provides 3 main functions: openCostsDB, addCost, getReport
  * - All functions use Promises (like async/await)
  * - Stores expense data in the browser's IndexedDB
  */
 
 // Create global database object as required by specifications
-window.db = {};
+// The lecturer specifically mentioned the property should be named 'idb'
+window.idb = {};
 
-// Also make it available as 'idb' for easier access
+// Also make it available as 'db' for compatibility
 if (typeof window !== 'undefined') {
-    window.idb = window.db;
+    window.idb = window.idb;
 }
 
 // Function 1: openCostsDB
 // This opens the database (like opening a file)
 // Give it a name like "costsdb" and version number like 1
-window.db.openCostsDB = function(databaseName, databaseVersion) {
+window.idb.openCostsDB = function(databaseName, databaseVersion) {
     return new Promise(function(resolve, reject) {
         // Check if browser supports IndexedDB
         if (!window.indexedDB) {
@@ -41,7 +42,7 @@ window.db.openCostsDB = function(databaseName, databaseVersion) {
             const database = event.target.result;
             
             // Store database reference for other functions to use
-            window.db.database = database;
+            window.idb.database = database;
             
             // Create wrapper object with required methods
             const databaseWrapper = {
@@ -54,21 +55,21 @@ window.db.openCostsDB = function(databaseName, databaseVersion) {
                 
                 // Required method: addCost
                 addCost: function(cost) {
-                    return window.db.addCost(cost);
+                    return window.idb.addCost(cost);
                 },
                 
                 // Required method: getReport  
                 getReport: function(year, month, currency) {
-                    return window.db.getReport(year, month, currency);
+                    return window.idb.getReport(year, month, currency);
                 },
                 
                 // Utility methods
                 getAllCosts: function() {
-                    return window.db.getAllCosts();
+                    return window.idb.getAllCosts();
                 },
                 
                 clearAllCosts: function() {
-                    return window.db.clearAllCosts();
+                    return window.idb.clearAllCosts();
                 }
             };
             
@@ -100,7 +101,7 @@ window.db.openCostsDB = function(databaseName, databaseVersion) {
 // Function 2: addCost
 // This saves a new expense to the database
 // Give it an object like: {sum: 25.50, currency: "USD", category: "Food", description: "Pizza"}
-window.db.addCost = function(cost) {
+window.idb.addCost = function(cost) {
     return new Promise(function(resolve, reject) {
         // Validate input parameters
         if (!cost) {
@@ -129,7 +130,7 @@ window.db.addCost = function(cost) {
         }
 
         // Check if database is initialized
-        if (!window.db.database) {
+        if (!window.idb.database) {
             reject(new Error('Database not initialized. Call openCostsDB first.'));
             return;
         }
@@ -148,7 +149,7 @@ window.db.addCost = function(cost) {
         };
 
         // Start a database transaction
-        const transaction = window.db.database.transaction(['costs'], 'readwrite');
+        const transaction = window.idb.database.transaction(['costs'], 'readwrite');
         const costsStore = transaction.objectStore('costs');
 
         // Add the cost item to the database
@@ -191,7 +192,7 @@ window.db.addCost = function(cost) {
 // Function 3: getReport
 // This gets all expenses for a specific month and converts them to your chosen currency
 // Example: getReport(2025, 9, "USD") gets September 2025 expenses in US Dollars
-window.db.getReport = function(year, month, currency) {
+window.idb.getReport = function(year, month, currency) {
     return new Promise(function(resolve, reject) {
         // Validate input parameters
         if (typeof year !== 'number') {
@@ -216,13 +217,13 @@ window.db.getReport = function(year, month, currency) {
         }
 
         // Check if database is initialized
-        if (!window.db.database) {
+        if (!window.idb.database) {
             reject(new Error('Database not initialized. Call openCostsDB first.'));
             return;
         }
 
         // Start a read-only transaction
-        const transaction = window.db.database.transaction(['costs'], 'readonly');
+        const transaction = window.idb.database.transaction(['costs'], 'readonly');
         const costsStore = transaction.objectStore('costs');
 
         // Get all costs from the database
@@ -328,14 +329,14 @@ function convertCurrency(amount, fromCurrency, toCurrency) {
 
 // Extra function: getAllCosts
 // This gets ALL expenses from the database (useful for testing)
-window.db.getAllCosts = function() {
+window.idb.getAllCosts = function() {
     return new Promise(function(resolve, reject) {
-        if (!window.db.database) {
+        if (!window.idb.database) {
             reject(new Error('Database not initialized. Call openCostsDB first.'));
             return;
         }
 
-        const transaction = window.db.database.transaction(['costs'], 'readonly');
+        const transaction = window.idb.database.transaction(['costs'], 'readonly');
         const costsStore = transaction.objectStore('costs');
         const getAllRequest = costsStore.getAll();
 
@@ -351,14 +352,14 @@ window.db.getAllCosts = function() {
 
 // Extra function: clearAllCosts
 // This deletes ALL expenses from the database (useful for testing)
-window.db.clearAllCosts = function() {
+window.idb.clearAllCosts = function() {
     return new Promise(function(resolve, reject) {
-        if (!window.db.database) {
+        if (!window.idb.database) {
             reject(new Error('Database not initialized. Call openCostsDB first.'));
             return;
         }
 
-        const transaction = window.db.database.transaction(['costs'], 'readwrite');
+        const transaction = window.idb.database.transaction(['costs'], 'readwrite');
         const costsStore = transaction.objectStore('costs');
         const clearRequest = costsStore.clear();
 

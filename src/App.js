@@ -1,21 +1,24 @@
-// App.js - Simple Student Version
-// This is the main file for our Cost Manager app
-// It creates the tabs and handles the database connection
+// App.js - This is the MAIN file that controls the entire app
+// Think of this as the "control center" that:
+// 1. Creates the tab navigation (Add Cost, Reports, Charts, Settings)
+// 2. Connects to the database when the app starts
+// 3. Shows messages to the user (success, error, etc.)
+// 4. Manages the overall app theme and appearance
 
 import React, { useState, useEffect } from 'react';
 import {
-  ThemeProvider,
-  createTheme,
-  CssBaseline,
-  Container,
-  AppBar,
-  Toolbar,
-  Typography,
-  Tabs,
-  Tab,
-  Box,
-  Alert,
-  Snackbar
+  ThemeProvider,  // Allows us to customize the app's colors and fonts
+  createTheme,    // Creates a custom theme (color scheme)
+  CssBaseline,    // Resets default browser styles for consistency
+  Container,      // Centers content and adds margins
+  AppBar,         // Top navigation bar
+  Toolbar,        // Container for items in the AppBar
+  Typography,     // For text and headings
+  Tabs,           // Tab navigation (Add Cost, Reports, etc.)
+  Tab,            // Individual tab button
+  Box,            // Generic container for layout
+  Alert,          // Colored message boxes
+  Snackbar        // Popup notifications (success, error messages)
 } from '@mui/material';
 import {
   AccountBalanceWallet as WalletIcon,
@@ -29,6 +32,15 @@ import AddCostTab from './components/AddCostTab';
 import ReportsTab from './components/ReportsTab';
 import ChartsTab from './components/ChartsTab';
 import SettingsTab from './components/SettingsTab';
+
+// Import currency service
+import { 
+  fetchExchangeRates, 
+  setExchangeUrl, 
+  getExchangeUrl,
+  getExchangeRates,
+  setExchangeRates
+} from './services/currencyService';
 
 // Create a simple blue theme for our app
 const theme = createTheme({
@@ -57,17 +69,6 @@ function App() {
   
   // State for database connection
   const [database, setDatabase] = useState(null);
-  
-  // State for exchange rates (default rates as per requirements)
-  const [exchangeRates, setExchangeRates] = useState({
-    USD: 1,
-    GBP: 1.8,
-    EURO: 0.7,
-    ILS: 3.4
-  });
-  
-  // State for exchange rate URL setting
-  const [exchangeRateUrl, setExchangeRateUrl] = useState('');
   
   // State for showing messages to user
   const [snackbar, setSnackbar] = useState({
@@ -98,17 +99,12 @@ function App() {
     initializeDatabase();
   }, []); // This runs once when the app starts
 
-  // Share exchange rates with the idb.js library
-  useEffect(() => {
-    window.app = { exchangeRates };
-  }, [exchangeRates]);
-
   // Load saved URL from browser storage when app starts
   useEffect(() => {
     const savedUrl = localStorage.getItem('exchangeRateUrl');
     if (savedUrl) {
-      setExchangeRateUrl(savedUrl);
-      fetchExchangeRates(savedUrl);
+      setExchangeUrl(savedUrl);
+      fetchExchangeRates();
     }
   }, []);
 
@@ -132,39 +128,23 @@ function App() {
     setSnackbar({ ...snackbar, open: false });
   }
 
-  // Function to get exchange rates from a URL
-  async function fetchExchangeRates(url) {
-    if (!url) return;
-    
-    try {
-      // Get data from the URL using fetch (as required by project)
-      const response = await fetch(url);
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      
-      // Convert the response to JavaScript object
-      const rates = await response.json();
-      setExchangeRates(rates);
-      showMessage('Exchange rates updated!', 'success');
-      
-    } catch (error) {
-      showMessage('Failed to get rates: ' + error.message, 'error');
-    }
-  }
-
   // Function to save the exchange rate URL
-  function saveSettings(url) {
+  async function saveSettings(url) {
     // Save to browser storage so we remember it next time
     localStorage.setItem('exchangeRateUrl', url);
-    setExchangeRateUrl(url);
+    setExchangeUrl(url);
     
     // Get new rates if user provided a URL
     if (url) {
-      fetchExchangeRates(url);
+      try {
+        await fetchExchangeRates();
+        showMessage('Settings saved! Exchange rates updated!', 'success');
+      } catch (error) {
+        showMessage('Settings saved! But failed to get rates: ' + error.message, 'warning');
+      }
+    } else {
+      showMessage('Settings saved!', 'success');
     }
-    
-    showMessage('Settings saved!', 'success');
   }
 
   // Render the main application
@@ -251,8 +231,8 @@ function App() {
               <TabPanel value={activeTab} index={3}>
                 <SettingsTab 
                   showMessage={showMessage}
-                  exchangeRateUrl={exchangeRateUrl}
-                  exchangeRates={exchangeRates}
+                  exchangeRateUrl={getExchangeUrl()}
+                  exchangeRates={getExchangeRates()}
                   onSaveSettings={saveSettings}
                 />
               </TabPanel>

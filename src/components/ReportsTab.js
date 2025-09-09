@@ -1,5 +1,4 @@
-// ReportsTab.js - Simple Student Version
-// This creates the monthly reports page where users can see their expenses
+// ReportsTab.js - Monthly reports page
 
 import React, { useState } from 'react';
 import {
@@ -21,9 +20,7 @@ import {
   CardContent
 } from '@mui/material';
 import { Assessment as ReportIcon } from '@mui/icons-material';
-
-// The 4 currencies we support
-const CURRENCIES = ['USD', 'ILS', 'GBP', 'EURO'];
+import { CURRENCIES } from '../services/currencyService';
 
 // All 12 months with their numbers (1-12)
 const MONTHS = [

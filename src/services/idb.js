@@ -1,60 +1,62 @@
-// idb.js - Database library for Cost Manager
-// Creates window.idb object with database functions
+// idb.js - React Version
+// Database library for Cost Manager - works with React imports
 
-// Create global database object
-window.idb = {};
+import { convertAmount } from './currencyService';
 
-// Also available as 'db' for compatibility
-if (typeof window !== 'undefined') {
-    window.db = window.idb;
-}
+// Store the database connection
+let database = null;
 
-// Open the costs database
-window.idb.openCostsDB = function(databaseName, databaseVersion) {
+// Open the database
+export function openCostsDB(databaseName, databaseVersion) {
     return new Promise(function(resolve, reject) {
+        // Check if browser supports IndexedDB
         if (!window.indexedDB) {
-            reject(new Error('IndexedDB not supported'));
+            reject(new Error('IndexedDB is not supported in this browser'));
             return;
         }
 
         // Open the database
         const request = indexedDB.open(databaseName, databaseVersion);
 
+        // Handle database opening errors
         request.onerror = function(event) {
             reject(new Error('Failed to open database: ' + event.target.error));
         };
 
+        // Handle successful database opening
         request.onsuccess = function(event) {
-            const database = event.target.result;
-            window.idb.database = database;
+            database = event.target.result;
             
+            // Create wrapper object with required methods
             const databaseWrapper = {
                 addCost: function(cost) {
-                    return window.idb.addCost(cost);
+                    return addCost(cost);
                 },
                 getReport: function(year, month, currency) {
-                    return window.idb.getReport(year, month, currency);
+                    return getReport(year, month, currency);
                 },
                 getAllCosts: function() {
-                    return window.idb.getAllCosts();
+                    return getAllCosts();
                 },
                 clearAllCosts: function() {
-                    return window.idb.clearAllCosts();
+                    return clearAllCosts();
                 }
             };
             
             resolve(databaseWrapper);
         };
 
+        // Create database structure when needed
         request.onupgradeneeded = function(event) {
-            const database = event.target.result;
+            const db = event.target.result;
             
-            if (!database.objectStoreNames.contains('costs')) {
-                const costsStore = database.createObjectStore('costs', { 
+            if (!db.objectStoreNames.contains('costs')) {
+                const costsStore = db.createObjectStore('costs', { 
                     keyPath: 'id',
                     autoIncrement: true
                 });
                 
+                // Create indexes for searching
                 costsStore.createIndex('year', 'year', { unique: false });
                 costsStore.createIndex('month', 'month', { unique: false });
                 costsStore.createIndex('category', 'category', { unique: false });
@@ -62,12 +64,12 @@ window.idb.openCostsDB = function(databaseName, databaseVersion) {
             }
         };
     });
-};
+}
 
-// Add a cost to the database
-window.idb.addCost = function(cost) {
+// Add a new cost to the database
+export function addCost(cost) {
     return new Promise(function(resolve, reject) {
-        // Validate input parameters
+        // Check inputs
         if (!cost) {
             reject(new Error('Cost object is required'));
             return;
@@ -93,41 +95,34 @@ window.idb.addCost = function(cost) {
             return;
         }
 
-        // Check if database is initialized
-        if (!window.idb.database) {
-            reject(new Error('Database not initialized. Call openCostsDB first.'));
+        if (!database) {
+            reject(new Error('Database not ready'));
             return;
         }
 
-        // Create the cost item with additional date information
+        // Create the cost item with date info
         const currentDate = new Date();
         const costItem = {
             sum: cost.sum,
             currency: cost.currency,
             category: cost.category,
             description: cost.description,
-            date: currentDate,                        // Full date object
-            year: currentDate.getFullYear(),          // Year (e.g., 2025)
-            month: currentDate.getMonth() + 1,        // Month 1-12 (getMonth returns 0-11)
-            day: currentDate.getDate()                // Day of month
+            date: currentDate,
+            year: currentDate.getFullYear(),
+            month: currentDate.getMonth() + 1,
+            day: currentDate.getDate()
         };
 
-        // Start a database transaction
-        const transaction = window.idb.database.transaction(['costs'], 'readwrite');
+        // Save to database
+        const transaction = database.transaction(['costs'], 'readwrite');
         const costsStore = transaction.objectStore('costs');
-
-        // Add the cost item to the database
         const addRequest = costsStore.add(costItem);
 
-        // Handle successful addition
         addRequest.onsuccess = function(event) {
-            // Get the added item to return it
             const getRequest = costsStore.get(event.target.result);
             
             getRequest.onsuccess = function() {
                 const addedItem = getRequest.result;
-                
-                // Return only the required properties as per specification
                 resolve({
                     sum: addedItem.sum,
                     currency: addedItem.currency,
@@ -137,26 +132,24 @@ window.idb.addCost = function(cost) {
             };
             
             getRequest.onerror = function() {
-                reject(new Error('Failed to retrieve added cost item'));
+                reject(new Error('Could not get added item'));
             };
         };
 
-        // Handle addition errors
         addRequest.onerror = function(event) {
-            reject(new Error('Failed to add cost item: ' + event.target.error));
+            reject(new Error('Could not add cost: ' + event.target.error));
         };
 
-        // Handle transaction errors
         transaction.onerror = function(event) {
-            reject(new Error('Transaction failed: ' + event.target.error));
+            reject(new Error('Database error: ' + event.target.error));
         };
     });
-};
+}
 
 // Get monthly report in chosen currency
-window.idb.getReport = function(year, month, currency) {
+export function getReport(year, month, currency) {
     return new Promise(function(resolve, reject) {
-        // Validate input parameters
+        // Check inputs
         if (typeof year !== 'number') {
             reject(new Error('Year must be a number'));
             return;
@@ -172,30 +165,25 @@ window.idb.getReport = function(year, month, currency) {
             return;
         }
 
-        // Validate month range
         if (month < 1 || month > 12) {
             reject(new Error('Month must be between 1 and 12'));
             return;
         }
 
-        // Check if database is initialized
-        if (!window.idb.database) {
-            reject(new Error('Database not initialized. Call openCostsDB first.'));
+        if (!database) {
+            reject(new Error('Database not ready'));
             return;
         }
 
-        // Start a read-only transaction
-        const transaction = window.idb.database.transaction(['costs'], 'readonly');
+        // Get all costs from database
+        const transaction = database.transaction(['costs'], 'readonly');
         const costsStore = transaction.objectStore('costs');
-
-        // Get all costs from the database
         const getAllRequest = costsStore.getAll();
 
-        // Handle successful data retrieval
         getAllRequest.onsuccess = function() {
             const allCosts = getAllRequest.result;
             
-            // Filter costs for the specified month and year
+            // Find costs for this month and year
             const filteredCosts = [];
             for (let i = 0; i < allCosts.length; i++) {
                 const cost = allCosts[i];
@@ -204,30 +192,27 @@ window.idb.getReport = function(year, month, currency) {
                 }
             }
 
-            // Convert costs to the target currency
+            // Convert costs to target currency
             const convertedCosts = [];
             let totalAmount = 0;
             
             for (let i = 0; i < filteredCosts.length; i++) {
                 const cost = filteredCosts[i];
+                const convertedAmount = convertAmount(cost.sum, cost.currency, currency);
                 
-                // Convert currency using helper function
-                const convertedAmount = convertCurrency(cost.sum, cost.currency, currency);
-                
-                // Create cost object in required format
                 const convertedCost = {
                     sum: convertedAmount,
                     currency: currency,
                     category: cost.category,
                     description: cost.description,
-                    Date: { day: cost.day }  // Note: Capital 'D' as per specification
+                    Date: { day: cost.day }
                 };
                 
                 convertedCosts.push(convertedCost);
                 totalAmount += convertedAmount;
             }
 
-            // Create report object in required format
+            // Create report
             const report = {
                 year: year,
                 month: month,
@@ -241,63 +226,27 @@ window.idb.getReport = function(year, month, currency) {
             resolve(report);
         };
 
-        // Handle data retrieval errors
         getAllRequest.onerror = function(event) {
-            reject(new Error('Failed to retrieve costs: ' + event.target.error));
+            reject(new Error('Could not get costs: ' + event.target.error));
         };
 
-        // Handle transaction errors
         transaction.onerror = function(event) {
-            reject(new Error('Transaction failed: ' + event.target.error));
+            reject(new Error('Database error: ' + event.target.error));
         };
     });
-};
-
-// Convert money from one currency to another
-// Uses the currency service if available, otherwise falls back to basic logic
-function convertCurrency(amount, fromCurrency, toCurrency) {
-    // Try to use currency service if available (when used with React)
-    if (window.currencyService && window.currencyService.convertAmount) {
-        return window.currencyService.convertAmount(amount, fromCurrency, toCurrency);
-    }
-    
-    // Fallback to basic conversion for vanilla usage
-    const defaultRates = { 
-        USD: 1,
-        GBP: 1.8,
-        EURO: 0.7,
-        ILS: 3.4
-    };
-    
-    let exchangeRates = defaultRates;
-    if (window.app && window.app.exchangeRates) {
-        exchangeRates = window.app.exchangeRates;
-    }
-    
-    if (fromCurrency === toCurrency) {
-        return amount;
-    }
-
-    if (!exchangeRates[fromCurrency] || !exchangeRates[toCurrency]) {
-        console.warn('No exchange rate for ' + fromCurrency + ' to ' + toCurrency);
-        return amount;
-    }
-
-    const usdAmount = amount / exchangeRates[fromCurrency];
-    const convertedAmount = usdAmount * exchangeRates[toCurrency];
-    
-    return convertedAmount;
 }
 
+// This function is no longer needed - using currency service instead
+
 // Get all costs (for testing)
-window.idb.getAllCosts = function() {
+export function getAllCosts() {
     return new Promise(function(resolve, reject) {
-        if (!window.idb.database) {
-            reject(new Error('Database not initialized. Call openCostsDB first.'));
+        if (!database) {
+            reject(new Error('Database not ready'));
             return;
         }
 
-        const transaction = window.idb.database.transaction(['costs'], 'readonly');
+        const transaction = database.transaction(['costs'], 'readonly');
         const costsStore = transaction.objectStore('costs');
         const getAllRequest = costsStore.getAll();
 
@@ -306,20 +255,20 @@ window.idb.getAllCosts = function() {
         };
 
         getAllRequest.onerror = function(event) {
-            reject(new Error('Failed to retrieve costs: ' + event.target.error));
+            reject(new Error('Could not get costs: ' + event.target.error));
         };
     });
-};
+}
 
 // Clear all costs (for testing)
-window.idb.clearAllCosts = function() {
+export function clearAllCosts() {
     return new Promise(function(resolve, reject) {
-        if (!window.idb.database) {
-            reject(new Error('Database not initialized. Call openCostsDB first.'));
+        if (!database) {
+            reject(new Error('Database not ready'));
             return;
         }
 
-        const transaction = window.idb.database.transaction(['costs'], 'readwrite');
+        const transaction = database.transaction(['costs'], 'readwrite');
         const costsStore = transaction.objectStore('costs');
         const clearRequest = costsStore.clear();
 
@@ -328,7 +277,18 @@ window.idb.clearAllCosts = function() {
         };
 
         clearRequest.onerror = function(event) {
-            reject(new Error('Failed to clear costs: ' + event.target.error));
+            reject(new Error('Could not clear costs: ' + event.target.error));
         };
     });
+}
+
+// Export everything together
+const idb = {
+    openCostsDB,
+    addCost,
+    getReport,
+    getAllCosts,
+    clearAllCosts
 };
+
+export default idb;
