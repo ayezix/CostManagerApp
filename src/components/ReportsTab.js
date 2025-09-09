@@ -20,23 +20,8 @@ import {
   CardContent
 } from '@mui/material';
 import { Assessment as ReportIcon } from '@mui/icons-material';
-import { CURRENCIES } from '../services/currencyService';
+import { CURRENCIES, MONTHS, getYearOptions, formatCurrency } from '../services/currencyService';
 
-// All 12 months with their numbers (1-12)
-const MONTHS = [
-  { value: 1, label: 'January' },
-  { value: 2, label: 'February' },
-  { value: 3, label: 'March' },
-  { value: 4, label: 'April' },
-  { value: 5, label: 'May' },
-  { value: 6, label: 'June' },
-  { value: 7, label: 'July' },
-  { value: 8, label: 'August' },
-  { value: 9, label: 'September' },
-  { value: 10, label: 'October' },
-  { value: 11, label: 'November' },
-  { value: 12, label: 'December' }
-];
 
 function ReportsTab({ showMessage, database }) {
   // What the user wants to see (which month, year, currency)
@@ -87,20 +72,7 @@ function ReportsTab({ showMessage, database }) {
     }
   };
 
-  // Helper function to show money nicely (like "USD 25.50")
-  const formatCurrency = (amount, currency) => {
-    return `${currency} ${amount.toFixed(2)}`;
-  };
 
-  // Get a list of years for the dropdown (current year and 5 years back)
-  const getYearOptions = () => {
-    const currentYear = new Date().getFullYear();
-    const years = [];
-    for (let year = currentYear; year >= currentYear - 5; year--) {
-      years.push(year);
-    }
-    return years;
-  };
 
   return (
     <Box>

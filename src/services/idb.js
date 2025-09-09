@@ -236,8 +236,6 @@ export function getReport(year, month, currency) {
     });
 }
 
-// This function is no longer needed - using currency service instead
-
 // Get all costs (for testing)
 export function getAllCosts() {
     return new Promise(function(resolve, reject) {

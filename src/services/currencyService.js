@@ -11,6 +11,22 @@ const DEFAULT_EXCHANGE_URL = 'https://api.exchangerate-api.com/v4/latest/USD';
 // The 4 currencies our app supports - you could add more if needed!
 export const CURRENCIES = ['USD', 'ILS', 'GBP', 'EURO'];
 
+// All 12 months with their numbers (1-12) - used by reports and charts
+export const MONTHS = [
+  { value: 1, label: 'January' },
+  { value: 2, label: 'February' },
+  { value: 3, label: 'March' },
+  { value: 4, label: 'April' },
+  { value: 5, label: 'May' },
+  { value: 6, label: 'June' },
+  { value: 7, label: 'July' },
+  { value: 8, label: 'August' },
+  { value: 9, label: 'September' },
+  { value: 10, label: 'October' },
+  { value: 11, label: 'November' },
+  { value: 12, label: 'December' }
+];
+
 // Information about each currency - full name and symbol
 // This helps us show "US Dollar ($)" instead of just "USD"
 export const CURRENCY_INFO = {
@@ -180,4 +196,14 @@ export const getCurrencySymbol = (currency) => {
 // Check if currency is supported
 export const isValidCurrency = (currency) => {
   return CURRENCIES.includes(currency);
+};
+
+// Get array of years for dropdowns (current year and 5 years back)
+export const getYearOptions = () => {
+  const currentYear = new Date().getFullYear();
+  const years = [];
+  for (let year = currentYear; year >= currentYear - 5; year--) {
+    years.push(year);
+  }
+  return years;
 };

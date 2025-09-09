@@ -13,25 +13,10 @@ import {
 import { BarChart as BarChartIcon, PieChart as PieChartIcon } from '@mui/icons-material';
 import { Chart as ChartJS, ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement, Title } from 'chart.js';
 import { Pie, Bar } from 'react-chartjs-2';
-import { CURRENCIES } from '../services/currencyService';
+import { CURRENCIES, MONTHS, getYearOptions } from '../services/currencyService';
 
 ChartJS.register(ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement, Title);
 
-// All 12 months with their numbers (1-12)
-const MONTHS = [
-  { value: 1, label: 'January' },
-  { value: 2, label: 'February' },
-  { value: 3, label: 'March' },
-  { value: 4, label: 'April' },
-  { value: 5, label: 'May' },
-  { value: 6, label: 'June' },
-  { value: 7, label: 'July' },
-  { value: 8, label: 'August' },
-  { value: 9, label: 'September' },
-  { value: 10, label: 'October' },
-  { value: 11, label: 'November' },
-  { value: 12, label: 'December' }
-];
 
 function ChartsTab({ showMessage, database }) {
   // Pie chart settings
@@ -176,14 +161,6 @@ function ChartsTab({ showMessage, database }) {
     }
   };
 
-  const getYearOptions = () => {
-    const currentYear = new Date().getFullYear();
-    const years = [];
-    for (let year = currentYear; year >= currentYear - 5; year--) {
-      years.push(year);
-    }
-    return years;
-  };
 
   const pieOptions = {
     responsive: true,
