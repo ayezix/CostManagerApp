@@ -13,28 +13,28 @@ import {
 import { BarChart as BarChartIcon, PieChart as PieChartIcon } from '@mui/icons-material';
 import { Chart as ChartJS, ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement, Title } from 'chart.js';
 import { Pie, Bar } from 'react-chartjs-2';
-import { CURRENCIES, MONTHS, getYearOptions } from '../services/currencyService';
+import { CURRENCIES, MONTHS, get_year_options } from '../services/currencyService';
 
 ChartJS.register(ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement, Title);
 
 
-function ChartsTab({ showMessage, database }) {
+function ChartsTab({ show_message, database }) {
   // Pie chart settings
-  const [pieFilters, setPieFilters] = useState({
+  const [pie_filters, set_pie_filters] = useState({
     year: new Date().getFullYear(),
     month: new Date().getMonth() + 1,
     currency: 'USD'
   });
   
   // Bar chart settings
-  const [barFilters, setBarFilters] = useState({
+  const [bar_filters, set_bar_filters] = useState({
     year: new Date().getFullYear(),
     currency: 'USD'
   });
   
   // Chart data
-  const [pieData, setPieData] = useState(null);
-  const [barData, setBarData] = useState(null);
+  const [pie_data, set_pie_data] = useState(null);
+  const [bar_data, set_bar_data] = useState(null);
   
   // Loading states
   const [loading, setLoading] = useState({ pie: false, bar: false });

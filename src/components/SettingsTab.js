@@ -17,21 +17,21 @@ import {
 } from '@mui/material';
 import { Save as SaveIcon, Settings as SettingsIcon } from '@mui/icons-material';
 
-function SettingsTab({ showMessage, exchangeRateUrl, exchangeRates, onSaveSettings }) {
+function SettingsTab({ show_message, exchange_rate_url, exchange_rates, on_save_settings }) {
   // Store the URL the user types
-  const [url, setUrl] = useState(exchangeRateUrl);
+  const [url, set_url] = useState(exchange_rate_url);
 
   // Function to save the URL when user clicks Save button
-  const handleSave = () => {
-    if (url && !isValidUrl(url)) {
-      showMessage('Please enter a valid URL', 'error');
+  const handle_save = function() {
+    if (url && !is_valid_url(url)) {
+      show_message('Please enter a valid URL', 'error');
       return;
     }
-    onSaveSettings(url);
+    on_save_settings(url);
   };
 
   // Helper function to check if URL is valid
-  const isValidUrl = (string) => {
+  const is_valid_url = function(string) {
     try {
       new URL(string);
       return true;
@@ -41,7 +41,7 @@ function SettingsTab({ showMessage, exchangeRateUrl, exchangeRates, onSaveSettin
   };
 
   // Helper function to show exchange rates nicely (4 decimal places)
-  const formatRate = (rate) => {
+  const format_rate = function(rate) {
     return typeof rate === 'number' ? rate.toFixed(4) : rate;
   };
 
@@ -62,7 +62,7 @@ function SettingsTab({ showMessage, exchangeRateUrl, exchangeRates, onSaveSettin
               label="Exchange Rate API URL"
               placeholder="https://api.example.com/exchange-rates.json"
               value={url}
-              onChange={(e) => setUrl(e.target.value)}
+              onChange={(e) => set_url(e.target.value)}
               helperText='URL should return JSON with format: {"USD":1, "GBP":1.8, "EURO":0.7, "ILS":3.4}'
               type="url"
             />
@@ -73,7 +73,7 @@ function SettingsTab({ showMessage, exchangeRateUrl, exchangeRates, onSaveSettin
               variant="contained"
               size="large"
               startIcon={<SaveIcon />}
-              onClick={handleSave}
+              onClick={handle_save}
               sx={{ mr: 2 }}
             >
               💾 Save Settings
@@ -81,7 +81,7 @@ function SettingsTab({ showMessage, exchangeRateUrl, exchangeRates, onSaveSettin
             <Button
               variant="outlined"
               size="large"
-              onClick={() => setUrl('')}
+              onClick={() => set_url('')}
             >
               Clear URL
             </Button>
@@ -110,10 +110,10 @@ function SettingsTab({ showMessage, exchangeRateUrl, exchangeRates, onSaveSettin
         </Typography>
 
         <Grid container spacing={2}>
-          {Object.entries(exchangeRates).map(([currency, rate]) => (
+          {Object.entries(exchange_rates).map(([currency, rate]) => (
             <Grid item key={currency}>
               <Chip
-                label={`${currency}: ${formatRate(rate)}`}
+                label={`${currency}: ${format_rate(rate)}`}
                 variant="outlined"
                 color="primary"
                 sx={{ fontSize: '0.9rem', px: 1 }}
@@ -122,15 +122,15 @@ function SettingsTab({ showMessage, exchangeRateUrl, exchangeRates, onSaveSettin
           ))}
         </Grid>
 
-        {exchangeRateUrl && (
+        {exchange_rate_url && (
           <Alert severity="success" sx={{ mt: 2 }}>
             <Typography variant="body2">
-              <strong>Source:</strong> {exchangeRateUrl}
+              <strong>Source:</strong> {exchange_rate_url}
             </Typography>
           </Alert>
         )}
 
-        {!exchangeRateUrl && (
+        {!exchange_rate_url && (
           <Alert severity="warning" sx={{ mt: 2 }}>
             <Typography variant="body2">
               <strong>Using default rates.</strong> Configure an API URL above to get live exchange rates.

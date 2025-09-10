@@ -1,7 +1,7 @@
 // idb.js - React Version
 // Database library for Cost Manager - works with React imports
 
-import { convertAmount } from './currencyService';
+import { convert_amount } from './currencyService';
 
 // Store the database connection
 let database = null;
@@ -198,7 +198,7 @@ export function getReport(year, month, currency) {
             
             for (let i = 0; i < filteredCosts.length; i++) {
                 const cost = filteredCosts[i];
-                const convertedAmount = convertAmount(cost.sum, cost.currency, currency);
+                const convertedAmount = convert_amount(cost.sum, cost.currency, currency);
                 
                 const convertedCost = {
                     sum: convertedAmount,

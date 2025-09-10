@@ -38,7 +38,7 @@ export const CURRENCY_INFO = {
 
 // These are the current exchange rates - how much 1 USD is worth in other currencies
 // For example: if USD is 1 and ILS is 3.5, then $1 = ₪3.5
-let exchangeRates = {
+let exchange_rates = {
   USD: 1,     // US Dollar is our "base" currency (always 1)
   GBP: 0.8,   // 1 USD = 0.8 British Pounds
   EURO: 0.85, // 1 USD = 0.85 Euros
@@ -46,14 +46,14 @@ let exchangeRates = {
 };
 
 // The website URL we use to get fresh exchange rates
-let exchangeUrl = DEFAULT_EXCHANGE_URL;
+let exchange_url = DEFAULT_EXCHANGE_URL;
 
 // This function gets fresh exchange rates from the internet
 // It's like checking the latest prices before buying something online
-export const fetchExchangeRates = async () => {
+export const fetch_exchange_rates = async function() {
   try {
     // Step 1: Ask the API website for current exchange rates
-    const response = await fetch(exchangeUrl);
+    const response = await fetch(exchange_url);
     
     // Step 2: Check if the website responded successfully
     if (!response.ok) {
@@ -73,13 +73,13 @@ export const fetchExchangeRates = async () => {
     };
     
     // Step 5: Update our app's exchange rates
-    exchangeRates = rates;
+    exchange_rates = rates;
     
     // Step 6: Share these rates with other parts of the app (like the database)
     // This is for backward compatibility with the old system
     if (window) {
       window.app = window.app || {};
-      window.app.exchangeRates = exchangeRates;
+      window.app.exchange_rates = exchange_rates;
     }
     
     // Step 7: Return the new rates
@@ -87,16 +87,16 @@ export const fetchExchangeRates = async () => {
   } catch (error) {
     // If anything goes wrong (no internet, bad URL, etc.), use our default rates
     console.warn('Could not get exchange rates, using defaults:', error);
-    return exchangeRates;
+    return exchange_rates;
   }
 };
 
 // This function converts money from one currency to another
 // Example: convertAmount(100, 'USD', 'ILS') converts $100 to Israeli Shekels
-export const convertAmount = (amount, fromCurrency, toCurrency) => {
+export const convert_amount = function(amount, from_currency, to_currency) {
   // If it's the same currency, no conversion needed
   // Like converting $5 to $5 - it stays $5!
-  if (fromCurrency === toCurrency) {
+  if (from_currency === to_currency) {
     return amount;
   }
   
@@ -108,63 +108,63 @@ export const convertAmount = (amount, fromCurrency, toCurrency) => {
   // Step 1: ₪100 ÷ 3.5 = $28.57 USD
   // Step 2: $28.57 × 0.85 = €24.29
   
-  const usdAmount = amount / exchangeRates[fromCurrency];        // Convert to USD first
-  const convertedAmount = usdAmount * exchangeRates[toCurrency]; // Then to target currency
+  const usd_amount = amount / exchange_rates[from_currency];        // Convert to USD first
+  const converted_amount = usd_amount * exchange_rates[to_currency]; // Then to target currency
   
-  return convertedAmount;
+  return converted_amount;
 };
 
 // Convert a whole report to different currency
-export const convertCurrency = async (report, targetCurrency) => {
+export const convert_currency = async function(report, target_currency) {
   // Get fresh exchange rates first
-  await fetchExchangeRates();
+  await fetch_exchange_rates();
   
-  const convertedCosts = report.costs.map(cost => ({
+  const converted_costs = report.costs.map(cost => ({
     ...cost,
-    sum: convertAmount(cost.sum || 0, cost.currency, targetCurrency),
-    currency: targetCurrency
+    sum: convert_amount(cost.sum || 0, cost.currency, target_currency),
+    currency: target_currency
   }));
   
-  const convertedTotal = convertedCosts.reduce((sum, cost) => sum + cost.sum, 0);
+  const converted_total = converted_costs.reduce((sum, cost) => sum + cost.sum, 0);
   
   return {
     ...report,
-    costs: convertedCosts,
+    costs: converted_costs,
     total: {
-      currency: targetCurrency,
-      total: convertedTotal
+      currency: target_currency,
+      total: converted_total
     }
   };
 };
 
 // Set the URL for getting exchange rates
-export const setExchangeUrl = (url) => {
-  exchangeUrl = url;
+export const set_exchange_url = function(url) {
+  exchange_url = url;
 };
 
 // Get the current exchange rates URL
-export const getExchangeUrl = () => {
-  return exchangeUrl;
+export const get_exchange_url = function() {
+  return exchange_url;
 };
 
 // Get current exchange rates
-export const getExchangeRates = () => {
-  return { ...exchangeRates };
+export const get_exchange_rates = function() {
+  return { ...exchange_rates };
 };
 
 // Set exchange rates manually
-export const setExchangeRates = (rates) => {
-  exchangeRates = { ...rates };
+export const set_exchange_rates = function(rates) {
+  exchange_rates = { ...rates };
   
   // Share with other parts of the app
   if (window) {
     window.app = window.app || {};
-    window.app.exchangeRates = exchangeRates;
+    window.app.exchange_rates = exchange_rates;
   }
 };
 
 // Format currency amount with symbol
-export const formatCurrency = (amount, currency) => {
+export const format_currency = function(amount, currency) {
   if (typeof amount !== 'number') {
     return 'Invalid amount';
   }
@@ -173,36 +173,36 @@ export const formatCurrency = (amount, currency) => {
     return `${amount.toFixed(2)} ${currency}`;
   }
 
-  const currencyInfo = CURRENCY_INFO[currency];
-  const formattedAmount = amount.toFixed(2);
+  const currency_info = CURRENCY_INFO[currency];
+  const formatted_amount = amount.toFixed(2);
   
-  if (currencyInfo.symbol) {
-    return `${currencyInfo.symbol}${formattedAmount}`;
+  if (currency_info.symbol) {
+    return `${currency_info.symbol}${formatted_amount}`;
   }
   
-  return `${formattedAmount} ${currency}`;
+  return `${formatted_amount} ${currency}`;
 };
 
 // Get currency display name
-export const getCurrencyName = (currency) => {
+export const get_currency_name = function(currency) {
   return CURRENCY_INFO[currency]?.name || currency;
 };
 
 // Get currency symbol
-export const getCurrencySymbol = (currency) => {
+export const get_currency_symbol = function(currency) {
   return CURRENCY_INFO[currency]?.symbol || currency;
 };
 
 // Check if currency is supported
-export const isValidCurrency = (currency) => {
+export const is_valid_currency = function(currency) {
   return CURRENCIES.includes(currency);
 };
 
 // Get array of years for dropdowns (current year and 5 years back)
-export const getYearOptions = () => {
-  const currentYear = new Date().getFullYear();
+export const get_year_options = function() {
+  const current_year = new Date().getFullYear();
   const years = [];
-  for (let year = currentYear; year >= currentYear - 5; year--) {
+  for (let year = current_year; year >= current_year - 5; year--) {
     years.push(year);
   }
   return years;

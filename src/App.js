@@ -35,11 +35,11 @@ import SettingsTab from './components/SettingsTab';
 
 // Import currency service
 import { 
-  fetchExchangeRates, 
-  setExchangeUrl, 
-  getExchangeUrl,
-  getExchangeRates,
-  setExchangeRates
+  fetch_exchange_rates, 
+  set_exchange_url, 
+  get_exchange_url,
+  get_exchange_rates,
+  set_exchange_rates
 } from './services/currencyService';
 
 // Create a simple blue theme for our app
@@ -65,7 +65,7 @@ function TabPanel({ children, value, index }) {
 
 function App() {
   // State for currently active tab (0=Add Cost, 1=Reports, 2=Charts, 3=Settings)
-  const [activeTab, setActiveTab] = useState(0);
+  const [active_tab, set_active_tab] = useState(0);
   
   // State for database connection
   const [database, setDatabase] = useState(null);
@@ -79,7 +79,7 @@ function App() {
 
   // Set up the database when the app starts
   useEffect(() => {
-    async function initializeDatabase() {
+    const initialize_database = async function() {
       try {
         // Check if our idb.js library is loaded
         if (window.idb) {
@@ -92,58 +92,58 @@ function App() {
         }
       } catch (error) {
         console.error('❌ Database failed to start:', error);
-        showMessage('Database error: ' + error.message, 'error');
+        show_message('Database error: ' + error.message, 'error');
       }
     }
     
-    initializeDatabase();
+    initialize_database();
   }, []); // This runs once when the app starts
 
   // Load saved URL from browser storage when app starts
   useEffect(() => {
     const savedUrl = localStorage.getItem('exchangeRateUrl');
     if (savedUrl) {
-      setExchangeUrl(savedUrl);
-      fetchExchangeRates();
+      set_exchange_url(savedUrl);
+      fetch_exchange_rates();
     }
   }, []);
 
   // Function to change active tab
-  function handleTabChange(event, newTabValue) {
-    setActiveTab(newTabValue);
-  }
+  const handle_tab_change = function(event, new_tab_value) {
+    set_active_tab(new_tab_value);
+  };
 
   // Function to show messages to user
-  function showMessage(message, severity = 'info') {
+  const show_message = function(message, severity = 'info') {
     setSnackbar({
       open: true,
       message: message,
       severity: severity
     });
-  }
+  };
 
   // Function to hide message
-  function handleSnackbarClose(event, reason) {
+  const handle_snackbar_close = function(event, reason) {
     if (reason === 'clickaway') return;
     setSnackbar({ ...snackbar, open: false });
-  }
+  };
 
   // Function to save the exchange rate URL
-  async function saveSettings(url) {
+  const save_settings = async function(url) {
     // Save to browser storage so we remember it next time
     localStorage.setItem('exchangeRateUrl', url);
-    setExchangeUrl(url);
+    set_exchange_url(url);
     
     // Get new rates if user provided a URL
     if (url) {
       try {
-        await fetchExchangeRates();
-        showMessage('Settings saved! Exchange rates updated!', 'success');
+        await fetch_exchange_rates();
+        show_message('Settings saved! Exchange rates updated!', 'success');
       } catch (error) {
-        showMessage('Settings saved! But failed to get rates: ' + error.message, 'warning');
+        show_message('Settings saved! But failed to get rates: ' + error.message, 'warning');
       }
     } else {
-      showMessage('Settings saved!', 'success');
+      show_message('Settings saved!', 'success');
     }
   }
 
@@ -178,8 +178,8 @@ function App() {
             
             {/* Tab Navigation */}
             <Tabs 
-              value={activeTab} 
-              onChange={handleTabChange} 
+              value={active_tab} 
+              onChange={handle_tab_change} 
               variant="fullWidth"
               sx={{ 
                 borderBottom: 1, 
@@ -213,27 +213,27 @@ function App() {
             <Box sx={{ p: 3, minHeight: 400 }}>
               
               {/* Add Cost Tab */}
-              <TabPanel value={activeTab} index={0}>
-                <AddCostTab showMessage={showMessage} database={database} />
+              <TabPanel value={active_tab} index={0}>
+                <AddCostTab show_message={show_message} database={database} />
               </TabPanel>
               
               {/* Reports Tab */}
-              <TabPanel value={activeTab} index={1}>
-                <ReportsTab showMessage={showMessage} database={database} />
+              <TabPanel value={active_tab} index={1}>
+                <ReportsTab show_message={show_message} database={database} />
               </TabPanel>
               
               {/* Charts Tab */}
-              <TabPanel value={activeTab} index={2}>
-                <ChartsTab showMessage={showMessage} database={database} />
+              <TabPanel value={active_tab} index={2}>
+                <ChartsTab show_message={show_message} database={database} />
               </TabPanel>
               
               {/* Settings Tab */}
-              <TabPanel value={activeTab} index={3}>
+              <TabPanel value={active_tab} index={3}>
                 <SettingsTab 
-                  showMessage={showMessage}
-                  exchangeRateUrl={getExchangeUrl()}
-                  exchangeRates={getExchangeRates()}
-                  onSaveSettings={saveSettings}
+                  show_message={show_message}
+                  exchange_rate_url={get_exchange_url()}
+                  exchange_rates={get_exchange_rates()}
+                  on_save_settings={save_settings}
                 />
               </TabPanel>
             </Box>
@@ -244,11 +244,11 @@ function App() {
         <Snackbar
           open={snackbar.open}
           autoHideDuration={6000}
-          onClose={handleSnackbarClose}
+          onClose={handle_snackbar_close}
           anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
         >
           <Alert 
-            onClose={handleSnackbarClose} 
+            onClose={handle_snackbar_close} 
             severity={snackbar.severity}
             variant="filled"
             sx={{ width: '100%' }}
