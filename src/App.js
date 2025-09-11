@@ -1,9 +1,18 @@
-// App.js - This is the MAIN file that controls the entire app
-// Think of this as the "control center" that:
-// 1. Creates the tab navigation (Add Cost, Reports, Charts, Settings)
-// 2. Connects to the database when the app starts
-// 3. Shows messages to the user (success, error, etc.)
-// 4. Manages the overall app theme and appearance
+/*
+ * App.js - The Main Application File
+ * 
+ * 🎯 What this file does (for students):
+ * 1. Creates the main app with 4 tabs: Add Cost, Reports, Charts, Settings
+ * 2. Connects to the database when the app starts (like opening a file)
+ * 3. Shows success/error messages to the user
+ * 4. Makes the app look nice with Material-UI theme
+ * 
+ * 📚 Key Learning Concepts:
+ * - React useState: Remembers things (like which tab is active)
+ * - React useEffect: Does things when the app starts
+ * - Props: Passing data between components (like giving information to a friend)
+ * - Event Handlers: Functions that run when user clicks buttons
+ */
 
 import React, { useState, useEffect } from 'react';
 import {
@@ -28,126 +37,191 @@ import {
 } from '@mui/icons-material';
 
 // Import our tab components
-import AddCostTab from './components/AddCostTab';
-import ReportsTab from './components/ReportsTab';
-import ChartsTab from './components/ChartsTab';
-import SettingsTab from './components/SettingsTab';
+import ADDCOSTTAB from './components/AddCostTab';
+import REPORTSTAB from './components/ReportsTab';
+import CHARTSTAB from './components/ChartsTab';
+import SETTINGSTAB from './components/SettingsTab';
 
 // Import currency service
 import { 
-  fetch_exchange_rates, 
-  set_exchange_url, 
-  get_exchange_url,
-  get_exchange_rates,
-  set_exchange_rates
+  fetchExchangeRates, 
+  setExchangeUrl, 
+  getExchangeUrl,
+  getExchangeRates,
+  setExchangeRates
 } from './services/currencyService';
 
-// Create a simple blue theme for our app
+// 🎨 Create a simple, student-friendly theme for our app
+// Think of this like choosing the colors for your website
 const theme = createTheme({
   palette: {
     primary: { 
-      main: '#1976d2' // Blue color
+      main: '#1976d2' // Main blue color (for buttons, headers, etc.)
     },
     secondary: { 
-      main: '#dc004e' // Pink color
+      main: '#dc004e' // Accent pink color (for special elements)
     }
   }
 });
 
-// Simple component to show the right tab content
-function TabPanel({ children, value, index }) {
+// 📋 Simple component to show the right tab content
+// This is like having 4 different pages, but only showing 1 at a time
+// For example: if user clicks "Reports" tab, only show the Reports content
+function TABPANEL({ children, value, index }) {
   return (
     <div role="tabpanel" hidden={value !== index}>
+      {/* Only show content if this is the active tab */}
       {value === index && <Box sx={{ py: 3 }}>{children}</Box>}
     </div>
   );
 }
 
-function App() {
-  // State for currently active tab (0=Add Cost, 1=Reports, 2=Charts, 3=Settings)
-  const [active_tab, set_active_tab] = useState(0);
+function APP() {
+  // 📊 React State Variables (these "remember" things for us)
   
-  // State for database connection
+  // Which tab is currently active? (0=Add Cost, 1=Reports, 2=Charts, 3=Settings)
+  // Think of this like having 4 buttons, and remembering which one was clicked
+  const [activeTab, setActiveTab] = useState(0);
+  
+  // Database connection - like having a connection to a file
+  // null means "not connected yet", object means "ready to use"
   const [database, setDatabase] = useState(null);
   
-  // State for showing messages to user
+  // Messages to show the user (success, error, info)
+  // This is like having a notification popup
   const [snackbar, setSnackbar] = useState({
-    open: false,
-    message: '',
-    severity: 'info'
+    open: false,        // Should we show the message? (true/false)
+    message: '',        // What message to show? (text)
+    severity: 'info'    // What type? ('success', 'error', 'info', 'warning')
   });
 
-  // Set up the database when the app starts
+  // 🚀 Set up the database when the app starts
+  // useEffect with empty [] means "run this code once when app starts"
   useEffect(() => {
-    const initialize_database = async function() {
+    // Step 1: Create a function to set up the database
+    const initializeDatabase = async function() {
       try {
-        // Check if our idb.js library is loaded
+        // Step 2: Check if our database library is available
         if (window.idb) {
-          // Open the database (like opening a file)
+          // Step 3: Open the database (like opening a file to store data)
           const db = await window.idb.openCostsDB('costsdb', 1);
-          setDatabase(db);
-          console.log('✅ Database is ready!');
+          setDatabase(db); // Save the database connection
+          console.log('✅ Database is ready to use!');
         } else {
-          throw new Error('idb.js library not loaded');
+          throw new Error('Database library not loaded');
         }
       } catch (error) {
         console.error('❌ Database failed to start:', error);
-        show_message('Database error: ' + error.message, 'error');
+        showMessage('Database error: ' + error.message, 'error');
       }
     }
     
-    initialize_database();
-  }, []); // This runs once when the app starts
+    // Step 4: Actually run the database setup
+    initializeDatabase();
+  }, []); // Empty array [] means "only run this once when app starts"
 
-  // Load saved URL from browser storage when app starts
+  // 💾 Load saved settings when app starts
+  // This is like remembering user preferences from last time
   useEffect(() => {
+    // Check if user saved a custom exchange rate URL before
     const savedUrl = localStorage.getItem('exchangeRateUrl');
     if (savedUrl) {
-      set_exchange_url(savedUrl);
-      fetch_exchange_rates();
+      setExchangeUrl(savedUrl);    // Use their saved URL
+      fetchExchangeRates();        // Get fresh exchange rates
     }
-  }, []);
+  }, []); // Run once when app starts
 
-  // Function to change active tab
-  const handle_tab_change = function(event, new_tab_value) {
-    set_active_tab(new_tab_value);
+  // 🔄 Event Handler Functions (these run when user does something)
+  
+  // When user clicks a different tab, switch to that tab
+  const handleTabChange = function(event, newTabValue) {
+    setActiveTab(newTabValue); // Update which tab is active
   };
 
-  // Function to show messages to user
-  const show_message = function(message, severity = 'info') {
+  // Show a message to the user (success, error, info, warning)
+  // This is like showing a popup notification
+  const showMessage = function(message, severity = 'info') {
     setSnackbar({
-      open: true,
-      message: message,
-      severity: severity
+      open: true,           // Show the message
+      message: message,     // What to say
+      severity: severity    // What type (green=success, red=error, etc.)
     });
   };
 
-  // Function to hide message
-  const handle_snackbar_close = function(event, reason) {
-    if (reason === 'clickaway') return;
-    setSnackbar({ ...snackbar, open: false });
+  // Hide the message when user clicks X or it times out
+  const handleSnackbarClose = function(event, reason) {
+    if (reason === 'clickaway') return; // Don't close if user clicked elsewhere
+    setSnackbar({ ...snackbar, open: false }); // Hide the message
   };
 
-  // Function to save the exchange rate URL
-  const save_settings = async function(url) {
-    // Save to browser storage so we remember it next time
+  // 💾 Save user settings (like exchange rate URL)
+  const saveSettings = async function(url) {
+    // Step 1: Save to browser storage so we remember next time
     localStorage.setItem('exchangeRateUrl', url);
-    set_exchange_url(url);
+    setExchangeUrl(url);
     
-    // Get new rates if user provided a URL
+    // Step 2: Try to get new exchange rates if user provided a URL
     if (url) {
       try {
-        await fetch_exchange_rates();
-        show_message('Settings saved! Exchange rates updated!', 'success');
+        await fetchExchangeRates(); // Get fresh rates from the internet
+        showMessage('Settings saved! Exchange rates updated!', 'success');
       } catch (error) {
-        show_message('Settings saved! But failed to get rates: ' + error.message, 'warning');
+        showMessage('Settings saved! But failed to get rates: ' + error.message, 'warning');
       }
     } else {
-      show_message('Settings saved!', 'success');
+      showMessage('Settings saved!', 'success');
     }
   }
 
-  // Render the main application
+  // 🔄 Refresh database connection (for debugging sync issues)
+  const refreshDatabase = async function() {
+    try {
+      // Step 1: Close existing connection if it exists
+      if (database && database._database) {
+        database._database.close();
+      }
+      
+      // Step 2: Clear the database state
+      setDatabase(null);
+      
+      // Step 3: Wait a moment for cleanup
+      await new Promise(resolve => setTimeout(resolve, 100));
+      
+      // Step 4: Reopen database with fresh connection
+      const db = await window.idb.openCostsDB('costsdb', 1);
+      setDatabase(db);
+      
+      showMessage('Database connection refreshed!', 'success');
+      console.log('🔄 Database refreshed successfully');
+    } catch (error) {
+      showMessage('Failed to refresh database: ' + error.message, 'error');
+      console.error('❌ Database refresh failed:', error);
+    }
+  }
+
+  // 🗑️ Clear all database data (for testing/debugging)
+  const clearDatabase = async function() {
+    try {
+      if (!database) {
+        showMessage('Database not ready', 'error');
+        return;
+      }
+      
+      // Step 1: Clear all data
+      await database.clearAllCosts();
+      
+      // Step 2: Refresh connection to ensure sync
+      await refreshDatabase();
+      
+      showMessage('Database cleared and refreshed!', 'success');
+      console.log('🗑️ Database cleared successfully');
+    } catch (error) {
+      showMessage('Failed to clear database: ' + error.message, 'error');
+      console.error('❌ Database clear failed:', error);
+    }
+  }
+
+  // 🎨 Render the main application (this creates the visual interface)
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
@@ -178,8 +252,8 @@ function App() {
             
             {/* Tab Navigation */}
             <Tabs 
-              value={active_tab} 
-              onChange={handle_tab_change} 
+              value={activeTab} 
+              onChange={handleTabChange} 
               variant="fullWidth"
               sx={{ 
                 borderBottom: 1, 
@@ -213,29 +287,31 @@ function App() {
             <Box sx={{ p: 3, minHeight: 400 }}>
               
               {/* Add Cost Tab */}
-              <TabPanel value={active_tab} index={0}>
-                <AddCostTab show_message={show_message} database={database} />
-              </TabPanel>
+              <TABPANEL value={activeTab} index={0}>
+                <ADDCOSTTAB showMessage={showMessage} database={database} />
+              </TABPANEL>
               
               {/* Reports Tab */}
-              <TabPanel value={active_tab} index={1}>
-                <ReportsTab show_message={show_message} database={database} />
-              </TabPanel>
+              <TABPANEL value={activeTab} index={1}>
+                <REPORTSTAB showMessage={showMessage} database={database} />
+              </TABPANEL>
               
               {/* Charts Tab */}
-              <TabPanel value={active_tab} index={2}>
-                <ChartsTab show_message={show_message} database={database} />
-              </TabPanel>
+              <TABPANEL value={activeTab} index={2}>
+                <CHARTSTAB showMessage={showMessage} database={database} />
+              </TABPANEL>
               
               {/* Settings Tab */}
-              <TabPanel value={active_tab} index={3}>
-                <SettingsTab 
-                  show_message={show_message}
-                  exchange_rate_url={get_exchange_url()}
-                  exchange_rates={get_exchange_rates()}
-                  on_save_settings={save_settings}
+              <TABPANEL value={activeTab} index={3}>
+                <SETTINGSTAB 
+                  showMessage={showMessage}
+                  exchangeRateUrl={getExchangeUrl()}
+                  exchangeRates={getExchangeRates()}
+                  onSaveSettings={saveSettings}
+                  onRefreshDatabase={refreshDatabase}
+                  onClearDatabase={clearDatabase}
                 />
-              </TabPanel>
+              </TABPANEL>
             </Box>
           </Box>
         </Container>
@@ -244,11 +320,11 @@ function App() {
         <Snackbar
           open={snackbar.open}
           autoHideDuration={6000}
-          onClose={handle_snackbar_close}
+          onClose={handleSnackbarClose}
           anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
         >
           <Alert 
-            onClose={handle_snackbar_close} 
+            onClose={handleSnackbarClose} 
             severity={snackbar.severity}
             variant="filled"
             sx={{ width: '100%' }}
@@ -261,4 +337,4 @@ function App() {
   );
 }
 
-export default App;
+export default APP;

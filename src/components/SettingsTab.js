@@ -1,5 +1,16 @@
-// SettingsTab.js - Simple Student Version
-// This creates the settings page where users can configure the exchange rate URL
+/*
+ * SettingsTab.js - Settings Configuration Page
+ * 
+ * 🎯 What this does (for students):
+ * This creates a settings page where users can configure the exchange rate URL.
+ * It shows current exchange rates and lets users enter a custom API URL.
+ * 
+ * 📚 Key Learning Concepts:
+ * - Form Input Handling: Managing text input with controlled components
+ * - URL Validation: Checking if user entered a valid web address
+ * - Conditional Rendering: Showing different content based on conditions
+ * - Props Usage: Receiving data and functions from parent component
+ */
 
 import React, { useState } from 'react';
 import {
@@ -16,32 +27,38 @@ import {
   Divider
 } from '@mui/material';
 import { Save as SaveIcon, Settings as SettingsIcon } from '@mui/icons-material';
+import { Refresh as RefreshIcon, Delete as DeleteIcon } from '@mui/icons-material';
 
-function SettingsTab({ show_message, exchange_rate_url, exchange_rates, on_save_settings }) {
-  // Store the URL the user types
-  const [url, set_url] = useState(exchange_rate_url);
+function SETTINGSTAB({ showMessage, exchangeRateUrl, exchangeRates, onSaveSettings, onRefreshDatabase, onClearDatabase }) {
+  // 📊 State to remember what URL the user types
+  // We start with the current URL (or empty string if none)
+  const [url, setUrl] = useState(exchangeRateUrl || '');
 
-  // Function to save the URL when user clicks Save button
-  const handle_save = function() {
-    if (url && !is_valid_url(url)) {
-      show_message('Please enter a valid URL', 'error');
-      return;
+  // 💾 Function to save the URL when user clicks Save button
+  const handleSave = function() {
+    // Step 1: Check if URL is valid (if user entered one)
+    if (url && !isValidUrl(url)) {
+      showMessage('Please enter a valid URL', 'error');
+      return; // Stop here if URL is invalid
     }
-    on_save_settings(url);
+    // Step 2: Save the URL using the function from parent component
+    onSaveSettings(url);
   };
 
-  // Helper function to check if URL is valid
-  const is_valid_url = function(string) {
+  // 🔍 Helper function to check if URL is valid
+  // This tries to create a URL object - if it fails, the URL is invalid
+  const isValidUrl = function(string) {
     try {
-      new URL(string);
-      return true;
+      new URL(string); // Try to create URL object
+      return true;     // Success = valid URL
     } catch (_) {
-      return false;
+      return false;    // Error = invalid URL
     }
   };
 
-  // Helper function to show exchange rates nicely (4 decimal places)
-  const format_rate = function(rate) {
+  // 🎨 Helper function to show exchange rates nicely (4 decimal places)
+  // This makes numbers like 3.456789 display as 3.4568
+  const formatRate = function(rate) {
     return typeof rate === 'number' ? rate.toFixed(4) : rate;
   };
 
@@ -62,7 +79,7 @@ function SettingsTab({ show_message, exchange_rate_url, exchange_rates, on_save_
               label="Exchange Rate API URL"
               placeholder="https://api.example.com/exchange-rates.json"
               value={url}
-              onChange={(e) => set_url(e.target.value)}
+              onChange={(e) => setUrl(e.target.value)}
               helperText='URL should return JSON with format: {"USD":1, "GBP":1.8, "EURO":0.7, "ILS":3.4}'
               type="url"
             />
@@ -73,7 +90,7 @@ function SettingsTab({ show_message, exchange_rate_url, exchange_rates, on_save_
               variant="contained"
               size="large"
               startIcon={<SaveIcon />}
-              onClick={handle_save}
+              onClick={handleSave}
               sx={{ mr: 2 }}
             >
               💾 Save Settings
@@ -81,7 +98,7 @@ function SettingsTab({ show_message, exchange_rate_url, exchange_rates, on_save_
             <Button
               variant="outlined"
               size="large"
-              onClick={() => set_url('')}
+              onClick={() => setUrl('')}
             >
               Clear URL
             </Button>
@@ -110,10 +127,10 @@ function SettingsTab({ show_message, exchange_rate_url, exchange_rates, on_save_
         </Typography>
 
         <Grid container spacing={2}>
-          {Object.entries(exchange_rates).map(([currency, rate]) => (
+          {exchangeRates && Object.entries(exchangeRates).map(([currency, rate]) => (
             <Grid item key={currency}>
               <Chip
-                label={`${currency}: ${format_rate(rate)}`}
+                label={`${currency}: ${formatRate(rate)}`}
                 variant="outlined"
                 color="primary"
                 sx={{ fontSize: '0.9rem', px: 1 }}
@@ -122,15 +139,15 @@ function SettingsTab({ show_message, exchange_rate_url, exchange_rates, on_save_
           ))}
         </Grid>
 
-        {exchange_rate_url && (
+        {exchangeRateUrl && (
           <Alert severity="success" sx={{ mt: 2 }}>
             <Typography variant="body2">
-              <strong>Source:</strong> {exchange_rate_url}
+              <strong>Source:</strong> {exchangeRateUrl}
             </Typography>
           </Alert>
         )}
 
-        {!exchange_rate_url && (
+        {!exchangeRateUrl && (
           <Alert severity="warning" sx={{ mt: 2 }}>
             <Typography variant="body2">
               <strong>Using default rates.</strong> Configure an API URL above to get live exchange rates.
@@ -231,8 +248,45 @@ function SettingsTab({ show_message, exchange_rate_url, exchange_rates, on_save_
           </CardContent>
         </Card>
       </Paper>
+
+      {/* Database Management Section */}
+      <Paper elevation={2} sx={{ p: 3 }}>
+        <Typography variant="h6" gutterBottom>
+          🗄️ Database Management
+        </Typography>
+        <Typography variant="body2" color="text.secondary" paragraph>
+          If you're experiencing issues with old data appearing after clearing the database, 
+          use the refresh button to reconnect to the database.
+        </Typography>
+        
+        <Box sx={{ display: 'flex', gap: 2, mt: 1 }}>
+          <Button
+            variant="outlined"
+            startIcon={<RefreshIcon />}
+            onClick={onRefreshDatabase}
+          >
+            Refresh Database Connection
+          </Button>
+          
+          <Button
+            variant="outlined"
+            color="error"
+            startIcon={<DeleteIcon />}
+            onClick={onClearDatabase}
+          >
+            Clear Database (Testing)
+          </Button>
+        </Box>
+        
+        <Alert severity="info" sx={{ mt: 2 }}>
+          <Typography variant="body2">
+            <strong>💡 Student Tip:</strong> This refresh button fixes synchronization issues 
+            between the test file and the React app by creating a fresh database connection.
+          </Typography>
+        </Alert>
+      </Paper>
     </Box>
   );
 }
 
-export default SettingsTab;
+export default SETTINGSTAB;

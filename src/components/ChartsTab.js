@@ -13,28 +13,28 @@ import {
 import { BarChart as BarChartIcon, PieChart as PieChartIcon } from '@mui/icons-material';
 import { Chart as ChartJS, ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement, Title } from 'chart.js';
 import { Pie, Bar } from 'react-chartjs-2';
-import { CURRENCIES, MONTHS, get_year_options } from '../services/currencyService';
+import { CURRENCIES, MONTHS, getYearOptions } from '../services/currencyService';
 
 ChartJS.register(ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement, Title);
 
 
-function ChartsTab({ show_message, database }) {
+function CHARTSTAB({ showMessage, database }) {
   // Pie chart settings
-  const [pie_filters, set_pie_filters] = useState({
+  const [pieFilters, setPieFilters] = useState({
     year: new Date().getFullYear(),
     month: new Date().getMonth() + 1,
     currency: 'USD'
   });
   
   // Bar chart settings
-  const [bar_filters, set_bar_filters] = useState({
+  const [barFilters, setBarFilters] = useState({
     year: new Date().getFullYear(),
     currency: 'USD'
   });
   
   // Chart data
-  const [pie_data, set_pie_data] = useState(null);
-  const [bar_data, set_bar_data] = useState(null);
+  const [pieData, setPieData] = useState(null);
+  const [barData, setBarData] = useState(null);
   
   // Loading states
   const [loading, setLoading] = useState({ pie: false, bar: false });
@@ -375,4 +375,4 @@ function ChartsTab({ show_message, database }) {
   );
 }
 
-export default ChartsTab;
+export default CHARTSTAB;

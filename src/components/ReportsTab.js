@@ -17,13 +17,14 @@ import {
   TableRow,
   Chip,
   Card,
-  CardContent
+  CardContent,
+  Alert
 } from '@mui/material';
 import { Assessment as ReportIcon } from '@mui/icons-material';
-import { CURRENCIES, MONTHS, get_year_options, format_currency } from '../services/currencyService';
+import { CURRENCIES, MONTHS, getYearOptions, formatCurrency } from '../services/currencyService';
 
 
-function ReportsTab({ show_message, database }) {
+function REPORTSTAB({ showMessage, database }) {
   // What the user wants to see (which month, year, currency)
   const [filters, setFilters] = useState({
     year: new Date().getFullYear(),        // Current year
@@ -38,17 +39,17 @@ function ReportsTab({ show_message, database }) {
   const [loading, setLoading] = useState(false);
 
   // Function to update filters when user changes dropdowns
-  const handle_change = function(field) {
+  const handleChange = function(field) {
     return function(event) {
       setFilters({ ...filters, [field]: event.target.value });
     };
   };
 
   // Function to get the report from the database
-  const generate_report = async function() {
+  const generateReport = async function() {
     // Check if database is ready
     if (!database) {
-      show_message('Database not ready yet', 'error');
+      showMessage('Database not ready yet', 'error');
       return;
     }
 
@@ -61,14 +62,14 @@ function ReportsTab({ show_message, database }) {
       
       // Tell user what we found
       if (reportData.costs.length === 0) {
-        show_message(`No expenses found for ${MONTHS.find(m => m.value === filters.month)?.label} ${filters.year}`, 'info');
+        showMessage(`No expenses found for ${MONTHS.find(m => m.value === filters.month)?.label} ${filters.year}`, 'info');
       } else {
-        show_message(`Found ${reportData.costs.length} expenses, total: ${reportData.total.total.toFixed(2)} ${reportData.total.currency}`, 'success');
+        showMessage(`Found ${reportData.costs.length} expenses, total: ${reportData.total.total.toFixed(2)} ${reportData.total.currency}`, 'success');
       }
       
     } catch (error) {
       console.error('Failed to generate report:', error);
-      show_message('Failed to generate report: ' + error.message, 'error');
+      showMessage('Failed to generate report: ' + error.message, 'error');
     } finally {
       setLoading(false);
     }
@@ -93,9 +94,9 @@ function ReportsTab({ show_message, database }) {
               select
               label="Year"
               value={filters.year}
-              onChange={handle_change('year')}
+              onChange={handleChange('year')}
             >
-              {get_year_options().map((year) => (
+              {getYearOptions().map((year) => (
                 <MenuItem key={year} value={year}>
                   {year}
                 </MenuItem>
@@ -109,7 +110,7 @@ function ReportsTab({ show_message, database }) {
               select
               label="Month"
               value={filters.month}
-              onChange={handle_change('month')}
+              onChange={handleChange('month')}
             >
               {MONTHS.map((month) => (
                 <MenuItem key={month.value} value={month.value}>
@@ -125,7 +126,7 @@ function ReportsTab({ show_message, database }) {
               select
               label="Currency"
               value={filters.currency}
-              onChange={handle_change('currency')}
+              onChange={handleChange('currency')}
             >
               {CURRENCIES.map((currency) => (
                 <MenuItem key={currency} value={currency}>
@@ -141,7 +142,7 @@ function ReportsTab({ show_message, database }) {
               variant="contained"
               size="large"
               startIcon={<ReportIcon />}
-              onClick={generate_report}
+              onClick={generateReport}
               disabled={loading}
             >
               {loading ? 'Generating...' : 'Generate Report'}
@@ -165,7 +166,7 @@ function ReportsTab({ show_message, database }) {
                     Total Expenses
                   </Typography>
                   <Typography variant="h4" color="primary">
-                    {format_currency(report.total.total, report.total.currency)}
+                    {formatCurrency(report.total.total, report.total.currency)}
                   </Typography>
                 </CardContent>
               </Card>
@@ -217,7 +218,7 @@ function ReportsTab({ show_message, database }) {
                         <Chip label={cost.category} size="small" variant="outlined" />
                       </TableCell>
                       <TableCell align="right">
-                        <strong>{format_currency(cost.sum, cost.currency)}</strong>
+                        <strong>{formatCurrency(cost.sum, cost.currency)}</strong>
                       </TableCell>
                     </TableRow>
                   ))}
@@ -240,4 +241,4 @@ function ReportsTab({ show_message, database }) {
   );
 }
 
-export default ReportsTab;
+export default REPORTSTAB;
