@@ -277,13 +277,6 @@ function SETTINGSTAB({ showMessage, exchangeRateUrl, exchangeRates, onSaveSettin
             Clear Database (Testing)
           </Button>
         </Box>
-        
-        <Alert severity="info" sx={{ mt: 2 }}>
-          <Typography variant="body2">
-            <strong>💡 Student Tip:</strong> This refresh button fixes synchronization issues 
-            between the test file and the React app by creating a fresh database connection.
-          </Typography>
-        </Alert>
       </Paper>
     </Box>
   );
