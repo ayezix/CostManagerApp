@@ -51,16 +51,39 @@ import {
   setExchangeRates
 } from './services/currencyService';
 
-// 🎨 Create a simple, student-friendly theme for our app
-// Think of this like choosing the colors for your website
+// Create a dark theme with olive green colors and heavier fonts
 const theme = createTheme({
   palette: {
+    mode: 'dark',
     primary: { 
-      main: '#1976d2' // Main blue color (for buttons, headers, etc.)
+      main: '#6b7c32', // Olive green
+      light: '#8fa652',
+      dark: '#4a5622'
     },
     secondary: { 
-      main: '#dc004e' // Accent pink color (for special elements)
+      main: '#8b4513' // Dark brown for accents
+    },
+    background: {
+      default: '#1a1a1a',
+      paper: '#2d2d2d'
+    },
+    text: {
+      primary: '#e0e0e0',
+      secondary: '#b0b0b0'
     }
+  },
+  typography: {
+    fontWeightLight: 500,
+    fontWeightRegular: 600,
+    fontWeightMedium: 700,
+    fontWeightBold: 800,
+    h1: { fontWeight: 800 },
+    h2: { fontWeight: 800 },
+    h3: { fontWeight: 700 },
+    h4: { fontWeight: 700 },
+    h5: { fontWeight: 700 },
+    h6: { fontWeight: 700 },
+    button: { fontWeight: 700 }
   }
 });
 
@@ -232,7 +255,7 @@ function APP() {
           <Container maxWidth="lg">
             <Toolbar>
               <Typography variant="h4" component="div" sx={{ flexGrow: 1 }}>
-                💰 Cost Manager
+                Cost Manager
               </Typography>
               <Typography variant="body2" sx={{ opacity: 0.9 }}>
                 React + MUI + IndexedDB Implementation
