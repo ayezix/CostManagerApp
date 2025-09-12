@@ -274,7 +274,7 @@ function SETTINGSTAB({ showMessage, exchangeRateUrl, exchangeRates, onSaveSettin
             startIcon={<DeleteIcon />}
             onClick={onClearDatabase}
           >
-            Clear Database (Testing)
+            Clear Database
           </Button>
         </Box>
       </Paper>
