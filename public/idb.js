@@ -3,7 +3,7 @@
  * This file creates a database library for the Cost Manager project
  * 
  * What this does:
- * - Creates window.idb and window.idb objects for the browser
+ * - Creates window.idb and window.db objects for the browser
  * - Provides 3 main functions: openCostsDB, addCost, getReport
  * - All functions use Promises (like async/await)
  * - Stores expense data in the browser's IndexedDB
@@ -15,7 +15,7 @@ window.idb = {};
 
 // Also make it available as 'db' for compatibility
 if (typeof window !== 'undefined') {
-    window.idb = window.idb;
+    window.db = window.idb;
 }
 
 // Function 1: openCostsDB
