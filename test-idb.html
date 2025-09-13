@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test idb.js Library</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .test-section {
+            background: white;
+            padding: 20px;
+            margin: 10px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .test-result {
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 4px;
+        }
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .info {
+            background-color: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        pre {
+            background-color: #f8f9fa;
+            padding: 10px;
+            border-radius: 4px;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>🧪 idb.js Library Test Page</h1>
+    <p>This page tests the vanilla JavaScript version of the idb.js library as required by the project specifications.</p>
+
+    <div class="test-section">
+        <h2>📋 Test Instructions</h2>
+        <p>Click the buttons below to test each function of the idb.js library:</p>
+        <ol>
+            <li><strong>Test Database Connection</strong> - Opens the database</li>
+            <li><strong>Test Add Cost</strong> - Adds sample expense items</li>
+            <li><strong>Test Get Report</strong> - Retrieves monthly report</li>
+            <li><strong>Test All Functions</strong> - Runs complete test suite</li>
+            <li><strong>Clear Database</strong> - Removes all test data</li>
+        </ol>
+    </div>
+
+    <div class="test-section">
+        <h2>🎮 Test Controls</h2>
+        <button onclick="testDatabaseConnection()">Test Database Connection</button>
+        <button onclick="testAddCost()">Test Add Cost</button>
+        <button onclick="testGetReport()">Test Get Report</button>
+        <button onclick="runAllTests()">Test All Functions</button>
+        <button onclick="clearDatabase()">Clear Database</button>
+    </div>
+
+    <div class="test-section">
+        <h2>📊 Test Results</h2>
+        <div id="test-results"></div>
+    </div>
+
+    <!-- Load the idb.js library -->
+    <script src="public/idb.js"></script>
+    
+    <script>
+        // Test results container
+        const resultsContainer = document.getElementById('test-results');
+        let testCount = 0;
+        let passCount = 0;
+        let failCount = 0;
+
+        // Helper function to add test results to the page
+        function addResult(message, type = 'info') {
+            testCount++;
+            const div = document.createElement('div');
+            div.className = `test-result ${type}`;
+            div.innerHTML = `<strong>Test ${testCount}:</strong> ${message}`;
+            resultsContainer.appendChild(div);
+            
+            if (type === 'success') passCount++;
+            if (type === 'error') failCount++;
+            
+            // Scroll to bottom to show latest result
+            div.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Test 1: Database Connection
+        async function testDatabaseConnection() {
+            addResult('Testing database connection...', 'info');
+            
+            try {
+                // Test the openCostsDB function
+                const db = await idb.openCostsDB("costsdb", 1);
+                
+                if (db && db._database) {
+                    addResult('✅ Database connection successful! Database name: ' + db.name, 'success');
+                    return db;
+                } else {
+                    addResult('❌ Database connection failed - invalid database object', 'error');
+                    return null;
+                }
+            } catch (error) {
+                addResult('❌ Database connection failed: ' + error.message, 'error');
+                return null;
+            }
+        }
+
+        // Test 2: Add Cost Function
+        async function testAddCost() {
+            addResult('Testing addCost function...', 'info');
+            
+            try {
+                // First ensure database is open
+                const db = await idb.openCostsDB("costsdb", 1);
+                
+                // Test adding a cost item (note: requirements had typo "curency" but we use correct "currency")
+                const testCost = {
+                    sum: 200,
+                    currency: "USD",
+                    category: "FOOD",
+                    description: "pizza"
+                };
+                
+                const result = await db.addCost(testCost);
+                
+                if (result && result.sum === 200 && result.currency === "USD") {
+                    addResult('✅ addCost function successful! Added: ' + JSON.stringify(result), 'success');
+                    return result;
+                } else {
+                    addResult('❌ addCost function failed - invalid result: ' + JSON.stringify(result), 'error');
+                    return null;
+                }
+            } catch (error) {
+                addResult('❌ addCost function failed: ' + error.message, 'error');
+                return null;
+            }
+        }
+
+        // Test 3: Get Report Function
+        async function testGetReport() {
+            addResult('Testing getReport function...', 'info');
+            
+            try {
+                // First ensure database is open
+                const db = await idb.openCostsDB("costsdb", 1);
+                
+                // Get current year and month
+                const now = new Date();
+                const currentYear = now.getFullYear();
+                const currentMonth = now.getMonth() + 1;
+                
+                // Test getting a report
+                const report = await db.getReport(currentYear, currentMonth, "USD");
+                
+                if (report && report.year === currentYear && report.month === currentMonth) {
+                    addResult('✅ getReport function successful! Report: ' + JSON.stringify(report, null, 2), 'success');
+                    return report;
+                } else {
+                    addResult('❌ getReport function failed - invalid report: ' + JSON.stringify(report), 'error');
+                    return null;
+                }
+            } catch (error) {
+                addResult('❌ getReport function failed: ' + error.message, 'error');
+                return null;
+            }
+        }
+
+        // Test 4: Run All Tests
+        async function runAllTests() {
+            addResult('🚀 Starting complete test suite...', 'info');
+            resultsContainer.innerHTML = ''; // Clear previous results
+            testCount = 0;
+            passCount = 0;
+            failCount = 0;
+            
+            // Run tests in sequence
+            await testDatabaseConnection();
+            await testAddCost();
+            await testAddCost(); // Add another cost for variety
+            await testGetReport();
+            
+            // Summary
+            addResult(`📊 Test Summary: ${passCount} passed, ${failCount} failed out of ${testCount} total tests`, 
+                     failCount === 0 ? 'success' : 'error');
+        }
+
+        // Test 5: Clear Database
+        async function clearDatabase() {
+            addResult('Clearing database...', 'info');
+            
+            try {
+                const db = await idb.openCostsDB("costsdb", 1);
+                await db.clearAllCosts();
+                addResult('✅ Database cleared successfully!', 'success');
+            } catch (error) {
+                addResult('❌ Failed to clear database: ' + error.message, 'error');
+            }
+        }
+
+        // Auto-run basic test when page loads
+        window.addEventListener('load', function() {
+            addResult('🎯 Test page loaded. Click buttons above to test the idb.js library.', 'info');
+        });
+    </script>
+</body>
+</html>

@@ -37,10 +37,10 @@ import {
 } from '@mui/icons-material';
 
 // Import our tab components
-import ADDCOSTTAB from './components/AddCostTab';
-import REPORTSTAB from './components/ReportsTab';
-import CHARTSTAB from './components/ChartsTab';
-import SETTINGSTAB from './components/SettingsTab';
+import ADDCOSTTAB from './components/AddCostTab.jsx';
+import REPORTSTAB from './components/ReportsTab.jsx';
+import CHARTSTAB from './components/ChartsTab.jsx';
+import SETTINGSTAB from './components/SettingsTab.jsx';
 
 // Import currency service
 import { 

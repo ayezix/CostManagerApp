@@ -26,10 +26,19 @@ This project teaches you:
 ## 🛠️ Technologies Used
 
 - **React 18** - The main framework for building the user interface
+- **Vite** - Fast build tool and development server
 - **Material-UI (MUI)** - Pre-built components for beautiful design
 - **IndexedDB** - Browser database for storing expenses locally
 - **Chart.js** - Library for creating interactive charts
 - **JavaScript ES6+** - Modern JavaScript features
+
+## ⚡ Vite Benefits
+
+This project now uses **Vite** instead of Create React App for:
+- **Faster development** - Hot Module Replacement (HMR) is much faster
+- **Faster builds** - Uses esbuild for bundling
+- **Better developer experience** - Instant server start
+- **Modern tooling** - Built for modern JavaScript/TypeScript projects
 
 ## 🚀 How to Run the Project
 
@@ -41,31 +50,39 @@ This downloads all the packages the project needs (React, Material-UI, Chart.js,
 
 ### Step 2: Start the Development Server
 ```bash
-npm start
+npm run dev
 ```
-This starts the React development server. Your app will automatically open in the browser!
+This starts the Vite development server. Your app will automatically open in the browser!
 
 ### Step 3: Open in Browser
-The app will automatically open at [http://localhost:3000](http://localhost:3000)
+The app will automatically open at [http://localhost:3001](http://localhost:3001)
+
+### Additional Commands
+```bash
+npm run build    # Build for production
+npm run preview  # Preview production build
+```
 
 ## 📁 Project Structure (What Each File Does)
 
 ```
 📁 cost-manager-app/
+├── 📄 index.html                    # Main HTML file (Vite entry point)
+├── 📄 vite.config.js                # Vite configuration
 ├── 📁 src/                          # Main source code folder
-│   ├── 📄 App.js                    # Main app component (creates the tabs)
-│   ├── 📄 index.js                  # Entry point (starts React)
+│   ├── 📄 App.jsx                   # Main app component (creates the tabs)
+│   ├── 📄 index.jsx                 # Entry point (starts React)
 │   ├── 📁 components/               # All our React components
-│   │   ├── 📄 AddCostTab.js         # Form to add new expenses
-│   │   ├── 📄 ReportsTab.js         # Shows monthly expense reports
-│   │   ├── 📄 ChartsTab.js          # Creates pie and bar charts
-│   │   └── 📄 SettingsTab.js        # Settings for exchange rates
+│   │   ├── 📄 AddCostTab.jsx        # Form to add new expenses
+│   │   ├── 📄 ReportsTab.jsx        # Shows monthly expense reports
+│   │   ├── 📄 ChartsTab.jsx         # Creates pie and bar charts
+│   │   └── 📄 SettingsTab.jsx       # Settings for exchange rates
 │   └── 📁 services/                 # Helper services
 │       ├── 📄 currencyService.js    # Handles currency conversion
 │       └── 📄 idb.js                # Database functions for React
-├── 📁 public/                       # Public files
-│   ├── 📄 index.html                # Main HTML file
+├── 📁 public/                       # Public files (served by Vite)
 │   ├── 📄 idb.js                    # Database library (vanilla JS)
+│   ├── 📄 manifest.json             # PWA manifest
 │   └── 📄 sample-rates.json         # Example exchange rates
 ├── 📄 idb.js                        # Vanilla JS database library (for testing)
 ├── 📄 test-idb.html                 # Test page for database functions

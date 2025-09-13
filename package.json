@@ -12,16 +12,13 @@
     "react": "^18.2.0",
     "react-chartjs-2": "^5.2.0",
     "react-dom": "^18.2.0",
-    "react-scripts": "5.0.1",
     "web-vitals": "^5.1.0"
   },
   "scripts": {
-    "start": "set PORT=3001 && react-scripts start",
-    "start:unix": "PORT=3001 react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject",
-    "dev": "set PORT=3001 && react-scripts start",
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "start": "vite",
     "serve-static": "npx serve -s build -l 3001"
   },
   "keywords": [

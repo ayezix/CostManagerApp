@@ -13,7 +13,7 @@
 
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import APP from './App';
+import APP from './App.jsx';
 
 // Find the div with id="root" in index.html and put our app there
 const root = ReactDOM.createRoot(document.getElementById('root'));
