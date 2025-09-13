@@ -13,7 +13,7 @@ import {
 import { BarChart as BarChartIcon, PieChart as PieChartIcon } from '@mui/icons-material';
 import { Chart as ChartJS, ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement, Title } from 'chart.js';
 import { Pie, Bar } from 'react-chartjs-2';
-import { CURRENCIES, MONTHS, getYearOptions } from '../services/currencyService';
+import { CURRENCIES, MONTHS, getYearOptions } from '../services/costManagerService';
 
 ChartJS.register(ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement, Title);
 

@@ -42,14 +42,14 @@ import REPORTSTAB from './components/ReportsTab.jsx';
 import CHARTSTAB from './components/ChartsTab.jsx';
 import SETTINGSTAB from './components/SettingsTab.jsx';
 
-// Import currency service
+// Import cost manager service
 import { 
   fetchExchangeRates, 
   setExchangeUrl, 
   getExchangeUrl,
   getExchangeRates,
   setExchangeRates
-} from './services/currencyService';
+} from './services/costManagerService';
 
 // Create a dark theme with olive green colors and heavier fonts
 const theme = createTheme({

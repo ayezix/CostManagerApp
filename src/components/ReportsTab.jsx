@@ -21,7 +21,7 @@ import {
   Alert
 } from '@mui/material';
 import { Assessment as ReportIcon } from '@mui/icons-material';
-import { CURRENCIES, MONTHS, getYearOptions, formatCurrency } from '../services/currencyService';
+import { CURRENCIES, MONTHS, getYearOptions, formatCurrency } from '../services/costManagerService';
 
 
 function REPORTSTAB({ showMessage, database }) {

@@ -80,6 +80,7 @@
         <button onclick="testDatabaseConnection()">Test Database Connection</button>
         <button onclick="testAddCost()">Test Add Cost</button>
         <button onclick="testGetReport()">Test Get Report</button>
+        <button onclick="testValidation()">Test Validation</button>
         <button onclick="runAllTests()">Test All Functions</button>
         <button onclick="clearDatabase()">Clear Database</button>
     </div>
@@ -208,13 +209,90 @@
             await testAddCost();
             await testAddCost(); // Add another cost for variety
             await testGetReport();
+            await testValidation();
             
             // Summary
             addResult(`📊 Test Summary: ${passCount} passed, ${failCount} failed out of ${testCount} total tests`, 
                      failCount === 0 ? 'success' : 'error');
         }
 
-        // Test 5: Clear Database
+        // Test 5: Validation Tests
+        async function testValidation() {
+            addResult('Testing validation functions...', 'info');
+            
+            try {
+                const db = await idb.openCostsDB("costsdb", 1);
+                
+                // Test 1: Invalid currency
+                try {
+                    await db.addCost({
+                        sum: 100,
+                        currency: "INVALID",
+                        category: "Test",
+                        description: "Test"
+                    });
+                    addResult('❌ Validation failed - should have rejected invalid currency', 'error');
+                } catch (error) {
+                    if (error.message.includes('Currency must be one of')) {
+                        addResult('✅ Currency validation working - rejected invalid currency', 'success');
+                    } else {
+                        addResult('❌ Unexpected error: ' + error.message, 'error');
+                    }
+                }
+                
+                // Test 2: Negative sum
+                try {
+                    await db.addCost({
+                        sum: -50,
+                        currency: "USD",
+                        category: "Test",
+                        description: "Test"
+                    });
+                    addResult('❌ Validation failed - should have rejected negative sum', 'error');
+                } catch (error) {
+                    if (error.message.includes('Sum must be a positive number')) {
+                        addResult('✅ Sum validation working - rejected negative sum', 'success');
+                    } else {
+                        addResult('❌ Unexpected error: ' + error.message, 'error');
+                    }
+                }
+                
+                // Test 3: Empty category
+                try {
+                    await db.addCost({
+                        sum: 100,
+                        currency: "USD",
+                        category: "",
+                        description: "Test"
+                    });
+                    addResult('❌ Validation failed - should have rejected empty category', 'error');
+                } catch (error) {
+                    if (error.message.includes('Category cannot be empty')) {
+                        addResult('✅ Category validation working - rejected empty category', 'success');
+                    } else {
+                        addResult('❌ Unexpected error: ' + error.message, 'error');
+                    }
+                }
+                
+                // Test 4: Valid data should work
+                try {
+                    const result = await db.addCost({
+                        sum: 100,
+                        currency: "USD",
+                        category: "Test",
+                        description: "Valid test data"
+                    });
+                    addResult('✅ Valid data accepted: ' + JSON.stringify(result), 'success');
+                } catch (error) {
+                    addResult('❌ Valid data rejected: ' + error.message, 'error');
+                }
+                
+            } catch (error) {
+                addResult('❌ Validation test failed: ' + error.message, 'error');
+            }
+        }
+
+        // Test 6: Clear Database
         async function clearDatabase() {
             addResult('Clearing database...', 'info');
             

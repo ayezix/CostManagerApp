@@ -25,7 +25,7 @@ import {
   Grid        // Helps arrange items in rows and columns
 } from '@mui/material';
 import { Add as AddIcon } from '@mui/icons-material'; // Plus icon for the button
-import { CURRENCIES, getCurrencyName } from '../services/currencyService'; // Import currency data
+import { CURRENCIES, getCurrencyName } from '../services/costManagerService'; // Import currency data
 
 // 📝 List of expense categories (types of things you spend money on)
 // Students can easily understand and modify this list
