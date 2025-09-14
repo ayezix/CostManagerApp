@@ -41,8 +41,11 @@ export function openCostsDB(databaseName, databaseVersion) {
                 addCost: function(cost) {
                     return addCost(cost);
                 },
-                getReport: function(year, month, currency) {
-                    return getReport(year, month, currency);
+                // Route getReport through the cost manager service so that
+                // currency conversion and totals are included as required
+                getReport: async function(year, month, currency) {
+                    const { getReport: costManagerGetReport } = await import('./costManagerService.js');
+                    return costManagerGetReport(year, month, currency);
                 },
                 getAllCosts: function() {
                     return getAllCosts();

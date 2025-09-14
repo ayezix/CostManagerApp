@@ -56,17 +56,29 @@ function REPORTSTAB({ showMessage, database }) {
     setLoading(true);
     
     try {
-      // Get expenses from database for the chosen month/year/currency
-      const reportData = await database.getReport(filters.year, filters.month, filters.currency);
+      const reportData = await database.getReport(
+        filters.year,
+        filters.month,
+        filters.currency
+      );
+
+      const hasTotals =
+        reportData &&
+        typeof reportData === 'object' &&
+        reportData.total &&
+        typeof reportData.total.total === 'number' &&
+        typeof reportData.total.currency === 'string';
+
       setReport(reportData);
-      
-      // Tell user what we found
-      if (reportData.costs.length === 0) {
+
+      if (!reportData || !Array.isArray(reportData.costs) || reportData.costs.length === 0) {
         showMessage(`No expenses found for ${MONTHS.find(m => m.value === filters.month)?.label} ${filters.year}`, 'info');
-      } else {
+      } else if (hasTotals) {
         showMessage(`Found ${reportData.costs.length} expenses, total: ${reportData.total.total.toFixed(2)} ${reportData.total.currency}`, 'success');
+      } else {
+        showMessage(`Found ${reportData.costs.length} expenses. Total not available yet (using default rates).`, 'warning');
       }
-      
+
     } catch (error) {
       console.error('Failed to generate report:', error);
       showMessage('Failed to generate report: ' + error.message, 'error');
@@ -166,7 +178,9 @@ function REPORTSTAB({ showMessage, database }) {
                     Total Expenses
                   </Typography>
                   <Typography variant="h4" color="primary">
-                    {formatCurrency(report.total.total, report.total.currency)}
+                    {report && report.total && typeof report.total.total === 'number'
+                      ? formatCurrency(report.total.total, report.total.currency)
+                      : 'N/A'}
                   </Typography>
                 </CardContent>
               </Card>

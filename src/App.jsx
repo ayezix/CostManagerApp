@@ -43,13 +43,15 @@ import CHARTSTAB from './components/ChartsTab.jsx';
 import SETTINGSTAB from './components/SettingsTab.jsx';
 
 // Import cost manager service
-import { 
+import {
   fetchExchangeRates, 
   setExchangeUrl, 
   getExchangeUrl,
   getExchangeRates,
   setExchangeRates
 } from './services/costManagerService';
+// Use React service-layer IndexedDB wrapper (not window.idb)
+import { openCostsDB as openCostsDBService } from './services/idb.js';
 
 // Create a dark theme with olive green colors and heavier fonts
 const theme = createTheme({
@@ -124,15 +126,10 @@ function APP() {
     // Step 1: Create a function to set up the database
     const initializeDatabase = async function() {
       try {
-        // Step 2: Check if our database library is available
-        if (window.idb) {
-          // Step 3: Open the database (like opening a file to store data)
-          const db = await window.idb.openCostsDB('costsdb', 1);
-          setDatabase(db); // Save the database connection
-          console.log('✅ Database is ready to use!');
-        } else {
-          throw new Error('Database library not loaded');
-        }
+        // Open the database using the React service layer
+        const db = await openCostsDBService('costsdb', 1);
+        setDatabase(db); // Save the database connection
+        console.log('✅ Database is ready to use!');
       } catch (error) {
         console.error('❌ Database failed to start:', error);
         showMessage('Database error: ' + error.message, 'error');
@@ -210,8 +207,8 @@ function APP() {
       // Step 3: Wait a moment for cleanup
       await new Promise(resolve => setTimeout(resolve, 100));
       
-      // Step 4: Reopen database with fresh connection
-      const db = await window.idb.openCostsDB('costsdb', 1);
+      // Step 4: Reopen database with fresh connection via React service layer
+      const db = await openCostsDBService('costsdb', 1);
       setDatabase(db);
       
       showMessage('Database connection refreshed!', 'success');
