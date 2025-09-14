@@ -10,7 +10,6 @@
  */
 
 // Create global database object as required by specifications
-// The lecturer specifically mentioned the property should be named 'idb'
 window.idb = {};
 
 // Also make it available as 'db' for compatibility
