@@ -187,8 +187,14 @@ function APP() {
 
     // Step 2: Refresh exchange rates immediately to reflect on screen
     try {
-      await fetchExchangeRates();
-      showMessage('Settings saved! Exchange rates updated!', 'success');
+      if (url) {
+        await fetchExchangeRates();
+        showMessage('Settings saved! Exchange rates updated!', 'success');
+      } else {
+        // Reset to built-in defaults without fetching
+        setExchangeRates({ USD: 1, GBP: 0.8, EURO: 0.85, ILS: 3.5 });
+        showMessage('Settings saved! Using default exchange rates', 'success');
+      }
     } catch (error) {
       showMessage('Settings saved! Using default exchange rates', 'warning');
     }
