@@ -176,20 +176,21 @@ function APP() {
 
   // 💾 Save user settings (like exchange rate URL)
   const saveSettings = async function(url) {
-    // Step 1: Save to browser storage so we remember next time
-    localStorage.setItem('exchangeRateUrl', url);
-    setExchangeUrl(url);
-    
-    // Step 2: Try to get new exchange rates if user provided a URL
+    // Step 1: Persist or remove URL so we remember next time
     if (url) {
-      try {
-        await fetchExchangeRates(); // Get fresh rates from the internet
-        showMessage('Settings saved! Exchange rates updated!', 'success');
-      } catch (error) {
-        showMessage('Settings saved! But failed to get rates: ' + error.message, 'warning');
-      }
+      localStorage.setItem('exchangeRateUrl', url);
+      setExchangeUrl(url);
     } else {
-      showMessage('Settings saved!', 'success');
+      localStorage.removeItem('exchangeRateUrl');
+      setExchangeUrl('');
+    }
+
+    // Step 2: Refresh exchange rates immediately to reflect on screen
+    try {
+      await fetchExchangeRates();
+      showMessage('Settings saved! Exchange rates updated!', 'success');
+    } catch (error) {
+      showMessage('Settings saved! Using default exchange rates', 'warning');
     }
   }
 

@@ -41,7 +41,9 @@ let exchangeUrl = defaultExchangeUrl;
 export const fetchExchangeRates = async function() {
   try {
     // Step 1: Ask the API website for current exchange rates
-    const response = await fetch(exchangeUrl);
+    // If no custom URL is configured, use the default endpoint
+    const urlToFetch = exchangeUrl || defaultExchangeUrl;
+    const response = await fetch(urlToFetch);
     
     // Step 2: Check if the website responded successfully
     if (!response.ok) {
@@ -52,11 +54,17 @@ export const fetchExchangeRates = async function() {
     const data = await response.json();
     
     // Step 4: Extract just the currencies we care about
+    // Support both shapes:
+    // 1) { rates: { USD, GBP, EUR, ILS } }
+    // 2) { USD, GBP, EURO, ILS }
+    const src = data && typeof data === 'object' && data.rates && typeof data.rates === 'object'
+      ? data.rates
+      : data;
     const rates = {
-      USD: data.rates.USD || 1,      // Use API rate, or fallback to 1
-      GBP: data.rates.GBP || 0.8,    // Use API rate, or fallback to 0.8
-      EURO: data.rates.EUR || 0.85,  // Note: API uses "EUR", we use "EURO"
-      ILS: data.rates.ILS || 3.5     // Use API rate, or fallback to 3.5
+      USD: (src && src.USD) ?? 1,
+      GBP: (src && src.GBP) ?? 0.8,
+      EURO: (src && (src.EURO ?? src.EUR)) ?? 0.85,  // accept EURO or EUR
+      ILS: (src && src.ILS) ?? 3.5
     };
     
     // Step 5: Update our app's exchange rates

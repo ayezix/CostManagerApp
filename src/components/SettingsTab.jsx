@@ -98,7 +98,7 @@ function SETTINGSTAB({ showMessage, exchangeRateUrl, exchangeRates, onSaveSettin
             <Button
               variant="outlined"
               size="large"
-              onClick={() => setUrl('')}
+              onClick={() => { setUrl(''); onSaveSettings(''); }}
             >
               Clear URL
             </Button>
